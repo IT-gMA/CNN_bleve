@@ -1,14 +1,7 @@
 import torch
-import torch.nn as nn
+from config import TRAIN_RATIO, VAL_RATIO, TEST_RATIO, BATCH_SIZE, NUM_WORKERS
 import utils
 from torch.utils.data import Dataset, DataLoader
-
-TRAIN_RATIO = 0.7
-VAL_RATIO = 0.15
-TEST_RATIO = 0.15
-
-BATCH_SIZE = 256
-NUM_WORKERS = 0
 
 
 def retrieve_dataset():
@@ -38,7 +31,7 @@ def dataset_import():
         num_workers=NUM_WORKERS
     )
 
-    valid_loader = DataLoader(
+    validation_loader = DataLoader(
         dataset=valid_dataset,
         batch_size=BATCH_SIZE,
         shuffle=False,
@@ -57,7 +50,7 @@ def dataset_import():
         print("Shape of y: ", y.shape, y.dtype)
         break
 
-    return train_loader, valid_loader, test_loader
+    return train_loader, validation_loader, test_loader
 
 
 if __name__ == '__main__':

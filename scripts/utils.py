@@ -6,12 +6,9 @@ import cv2
 import glob, sys
 from natsort import natsorted, ns
 import torch, torchvision
+from config import OUTPUT_FILE, IMG_DIR, NUM_ROW, NUM_COLUMN, FILE_EXTENSION
 
-OUTPUT_FILE = '../data/outputs/outputs.txt'
-IMG_DIR = '../data'
 np.set_printoptions(threshold=sys.maxsize)
-NUM_ROW = 30
-NUM_COLUMN = 30
 
 
 def collate_fn(batch):
@@ -41,7 +38,7 @@ def read_output_txt():
 def read_img():
     transform = torchvision.transforms.ToTensor()
     dataset_img = []
-    img_paths = glob.glob("{}/*.png".format(IMG_DIR))
+    img_paths = glob.glob("{}/*{}".format(IMG_DIR, FILE_EXTENSION))
     img_paths = natsorted(img_paths, key=lambda y: y.lower())   # Sort the images in alphanumerical order
     for img in img_paths:
         #print(f"read {img}")
@@ -91,5 +88,5 @@ if __name__ == '__main__':
         cv2.waitKey(0)
         cv2.destroyAllWindows()'''
     output_txt = read_output_txt()
-    print(output_txt)
+    print(output_txt.reshape(-1, 1))
 
