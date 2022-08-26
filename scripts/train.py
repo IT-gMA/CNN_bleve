@@ -12,7 +12,11 @@ from model import create_model
 
 
 np.set_printoptions(threshold=sys.maxsize)
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "mps"
+if DEVICE == "cuda":
+    print("Running on x86 GPU")
+else:
+    print("Running on arm64 GPU")
 
 
 # Define the NN model:
@@ -109,25 +113,25 @@ def train(train_data_loader, model, optimiser):
 
     for batch, (X, y) in enumerate(train_data_loader):
         X, y = X.to(DEVICE), y.to(DEVICE)
-        optimiser.zero_grad()  # Empty the gradient, no need to specify a learning rate here
+        pred = abs(model(X))  # Forward pass
+        print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
-        pred = model(X)  # Forward pass
+        loss_value = F.mse_loss(pred, y)
+        if DEVICE == "mps":
+            # mps framework supports float32 instead of 64 unlike cuda
+            loss_value = loss_value.type(torch.float32)
 
-        losses = sum(loss for loss in pred.values())
-        loss_value = losses.item()
-        train_loss_list.append(loss_value)  # Append the total loss value of this batch to the global list
-
-        losses.backward()  # Perform backpropagation
-        optimiser.step()  # Update the parameters such as weights and biases
-
-        train_itr += 1
+        # Backpropagation
+        optimiser.zero_grad()
+        loss_value.backward()
+        optimiser.step()
 
         if batch % 100 == 0:
             mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
-    return train_loss_list
+    #return train_loss_list
 
 
 def main() -> object:
