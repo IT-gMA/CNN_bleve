@@ -28,9 +28,10 @@ def read_output_txt():
     with open(OUTPUT_FILE, 'r') as f:
         outputs = f.readlines()
         for output in outputs:
-            output = float(output[:-1])  # Detach "new line" from each read line
+            y_true = []
+            y_true.append(float(output[:-1]))  # Detach "new line" from each read line
             #print(output)
-            output_list.append(output)
+            output_list.append(y_true)
 
     output_list = np.float32(output_list)
     output_list = torch.from_numpy(np.asarray(output_list))
@@ -79,7 +80,7 @@ def check_data_vs_output_quantity(img_list, output_list):
 
 
 if __name__ == '__main__':
-    dataset = create_raw_dataset()
+    #dataset = create_raw_dataset()
 
     '''saved_dir = '../data/tru_sized_imgs'
     os.chdir(saved_dir)
@@ -89,4 +90,6 @@ if __name__ == '__main__':
         cv2.imwrite(f"{dataset[i][1]}.png", dataset[i][0])
         cv2.waitKey(0)
         cv2.destroyAllWindows()'''
+    output_txt = read_output_txt()
+    print(output_txt)
 
