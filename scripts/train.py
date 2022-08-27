@@ -52,7 +52,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         pred = abs(model(X))
         #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
-        loss_value = loss_func(pred.squeeze(), y)
+        loss_value = loss_func(pred, y)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
@@ -63,7 +63,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         optimiser.step()
 
         if batch % 100 == 0:
-            mape = mean_absolute_percentage_error(y, pred.squeeze())
+            mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
