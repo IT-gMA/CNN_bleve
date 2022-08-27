@@ -5,7 +5,7 @@ from dataset import dataset_import
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
-from config import LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE
+from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE
 import torch.nn.functional as F
 import torchvision
 from model import create_model
@@ -19,7 +19,7 @@ def model_param_tweaking(model):
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
                                                            factor=0.1, patience=10, threshold=0.0001,
-                                                           threshold_mode='abs')
+                                                           threshold_mode='abs', min_lr=MIN_LEARNING_RATE)
     return loss_func, optimiser, scheduler
 
 
