@@ -17,7 +17,10 @@ np.set_printoptions(threshold=sys.maxsize)
 def model_param_tweaking(model):
     loss_func = nn.MSELoss(reduction='mean')
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-    return loss_func, optimiser
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
+                                                           factor=0.1, patience=10, threshold=0.0001,
+                                                           threshold_mode='abs')
+    return loss_func, optimiser, scheduler
 
 
 def test(dataloader, model, loss_func):
@@ -39,10 +42,8 @@ def test(dataloader, model, loss_func):
 
 
 def train(train_dataloader, model, loss_func, optimiser):
-    print('Training')
     size = len(train_dataloader.dataset)
-    global train_itr  # A list that stores all the training iterations
-    global train_loss_list  # A list that stores all the training loss values
+    total_loss = 0
 
     # Training
     for batch, (X, y) in enumerate(train_dataloader):
@@ -61,6 +62,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         optimiser.zero_grad()
         loss_value.backward()
         optimiser.step()
+        total_loss += loss_value
 
         if batch % 100 == 0:
             mape = mean_absolute_percentage_error(y, pred)
@@ -68,6 +70,8 @@ def train(train_dataloader, model, loss_func, optimiser):
             loss_value, current = loss_value.item(), batch * len(X)
             #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
+
+    return total_loss
 
 
 def validation(val_dataloader, model, loss_func):
@@ -93,20 +97,19 @@ def main() -> object:
     train_dataloader, validation_dataloader, test_loader = dataset_import()
     model = create_model().to(DEVICE)
     print(model)
-    # Get the model parameters: put each of the model's parameter value into a list
-    #params = [p for p in model.parameters() if p.requires_grad]
-    loss_func, optimiser = model_param_tweaking(model)
-    #optimiser = torch.optim.AdamW(params, lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+    loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
     epochs = NUM_EPOCHS
     for i in range(epochs):
         print("Epoch {}\n__________________________________________".format(i + 1))
         #train_model(train_dataloader, model, loss_func, optimiser)
-        train(train_dataloader, model, loss_func, optimiser)
+        train_loss = train(train_dataloader, model, loss_func, optimiser)
         if i % 5 == 0:
-            print("Validation:\n----------------------------------------------------------------\n")
+            print("-------------------------------------------------------------------------------\n")
             validation(validation_dataloader, model, loss_func)
             print("-------------------------------------------------------------------------------\n")
+
+        lr_scheduler.step(train_loss)
     print("Completed")
 
     '''model_saved_state = save_model(model)
