@@ -104,7 +104,9 @@ def main() -> object:
         #train_model(train_dataloader, model, loss_func, optimiser)
         train(train_dataloader, model, loss_func, optimiser)
         if i % 5 == 0:
+            print("Validation:\n----------------------------------------------------------------\n")
             validation(validation_dataloader, model, loss_func)
+            print("-------------------------------------------------------------------------------\n")
     print("Completed")
 
     '''model_saved_state = save_model(model)
