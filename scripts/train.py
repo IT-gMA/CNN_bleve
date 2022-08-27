@@ -19,7 +19,7 @@ def model_param_tweaking(model):
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
                                                            factor=0.1, patience=10, threshold=0.0001,
-                                                           threshold_mode='abs', min_lr=MIN_LEARNING_RATE)
+                                                           threshold_mode='abs')
     return loss_func, optimiser, scheduler
 
 
@@ -90,6 +90,7 @@ def validation(val_dataloader, model, loss_func):
         mape = mean_absolute_percentage_error(y, pred)
         rmse = RMSELoss(y, pred)
         loss_value, current = loss_value.item(), batch * len(X)
+        print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
@@ -105,7 +106,7 @@ def main() -> object:
         #train_model(train_dataloader, model, loss_func, optimiser)
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         if i % 5 == 0:
-            print("-------------------------------------------------------------------------------\n")
+            print("-------------------------------------------------------------------------------")
             validation(validation_dataloader, model, loss_func)
             print("-------------------------------------------------------------------------------\n")
 
