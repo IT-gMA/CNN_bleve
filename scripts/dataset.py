@@ -45,14 +45,13 @@ def dataset_import():
         num_workers=NUM_WORKERS
     )
 
-    for X, y in train_loader:
-        print("Shape of X [N, C, H, W]: ", X.shape)
-        print("Shape of y: ", y.shape, y.dtype)
-        break
-
     return train_loader, validation_loader, test_loader
 
 
 if __name__ == '__main__':
     train_loader, valid_loader, test_loader = dataset_import()
+    for X, y in train_loader:
+        print("Shape of X [N, C, H, W]: ", X.shape)
+        print("Shape of y: ", y.shape, y.dtype)
+        break
     print(train_loader.dataset)
