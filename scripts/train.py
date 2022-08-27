@@ -46,6 +46,7 @@ def train(train_dataloader, model, loss_func, optimiser):
     total_loss = 0
 
     # Training
+    model.train()
     for batch, (X, y) in enumerate(train_dataloader):
         X, y = X.to(DEVICE), y.to(DEVICE)
 
@@ -76,10 +77,12 @@ def train(train_dataloader, model, loss_func, optimiser):
 
 def validation(val_dataloader, model, loss_func):
     size = len(val_dataloader.dataset)
+
+    # Start model evaluation
+    model.eval()
     for batch, (X, y) in enumerate(val_dataloader):
         # Forward pass
         X, y = X.to(DEVICE), y.to(DEVICE)
-        model.eval()
         pred = model(X)
 
         loss_value = loss_func(pred.squeeze(), y)
