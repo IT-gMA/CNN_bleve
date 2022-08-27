@@ -15,10 +15,10 @@ np.set_printoptions(threshold=sys.maxsize)
 
 
 def model_param_tweaking(model):
-    loss_func = nn.MSELoss(reduction='mean')
+    loss_func = nn.MSELoss(reduction="sum")
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
-                                                           factor=0.1, patience=10, threshold=0.0001,
+                                                           factor=0.1, patience=16, threshold=0.0001,
                                                            threshold_mode='abs')
     return loss_func, optimiser, scheduler
 
@@ -33,11 +33,11 @@ def test(dataloader, model, loss_func):
             X, y = X.to(DEVICE), y.to(DEVICE)
             pred = model(X)
             #test_loss += loss_func(pred, y).item()
-            test_loss += loss_func(pred, y).item()
+            test_loss += loss_func(pred.squeeze(), y).item()
 
     test_loss /= num_batches
-    mape = mean_absolute_percentage_error(y, pred)
-    rmse = RMSELoss(y, pred)
+    mape = mean_absolute_percentage_error(y, pred.squeeze())
+    rmse = RMSELoss(y, pred.squeeze())
     print(f"\nTest Error: \n rmse: {rmse:>0.4f}, mape: {mape:>0.4f}, Avg loss: {test_loss:>8f} \n")
 
 
@@ -53,7 +53,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         pred = model(X)
         #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
-        loss_value = loss_func(pred, y)
+        loss_value = loss_func(pred.squeeze(), y)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
@@ -65,10 +65,10 @@ def train(train_dataloader, model, loss_func, optimiser):
         total_loss += loss_value
 
         if batch % 100 == 0:
-            mape = mean_absolute_percentage_error(y, pred)
-            rmse = RMSELoss(y, pred)
+            mape = mean_absolute_percentage_error(y, pred.squeeze())
+            rmse = RMSELoss(y, pred.squeeze())
             loss_value, current = loss_value.item(), batch * len(X)
-            #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
+            #print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
     return total_loss
@@ -82,15 +82,15 @@ def validation(val_dataloader, model, loss_func):
         model.eval()
         pred = model(X)
 
-        loss_value = loss_func(pred, y)
+        loss_value = loss_func(pred.squeeze(), y)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
 
-        mape = mean_absolute_percentage_error(y, pred)
-        rmse = RMSELoss(y, pred)
+        mape = mean_absolute_percentage_error(y, pred.squeeze())
+        rmse = RMSELoss(y, pred.squeeze())
         loss_value, current = loss_value.item(), batch * len(X)
-        print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
+        print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
@@ -105,12 +105,12 @@ def main() -> object:
         print("Epoch {}\n__________________________________________".format(i + 1))
         #train_model(train_dataloader, model, loss_func, optimiser)
         train_loss = train(train_dataloader, model, loss_func, optimiser)
+        lr_scheduler.step(train_loss)
         if i % 5 == 0:
             print("-------------------------------------------------------------------------------")
             validation(validation_dataloader, model, loss_func)
             print("-------------------------------------------------------------------------------\n")
 
-        lr_scheduler.step(train_loss)
     print("Completed")
 
     '''model_saved_state = save_model(model)

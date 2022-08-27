@@ -25,10 +25,9 @@ def read_output_txt():
     with open(OUTPUT_FILE, 'r') as f:
         outputs = f.readlines()
         for output in outputs:
-            y_true = []
-            y_true.append(float(output[:-1]))  # Detach "new line" from each read line
+            output = float(output[:-1])
             #print(output)
-            output_list.append(y_true)
+            output_list.append(output)
 
     output_list = np.float32(output_list)
     output_list = torch.from_numpy(np.asarray(output_list))
