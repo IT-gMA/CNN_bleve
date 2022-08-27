@@ -66,7 +66,7 @@ def train(train_dataloader, model, loss_func, optimiser):
             mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
-            print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
+            #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
@@ -76,14 +76,14 @@ def validation(val_dataloader, model, loss_func):
         # Forward pass
         X, y = X.to(DEVICE), y.to(DEVICE)
         model.eval()
-        pred = abs(model(X))
+        pred = model(X)
 
-        loss_value = loss_func(pred.squeeze(), y)
+        loss_value = loss_func(pred, y)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
 
-        mape = mean_absolute_percentage_error(y, pred.squeeze())
+        mape = mean_absolute_percentage_error(y, pred)
         rmse = RMSELoss(y, pred)
         loss_value, current = loss_value.item(), batch * len(X)
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
