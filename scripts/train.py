@@ -49,7 +49,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         X, y = X.to(DEVICE), y.to(DEVICE)
 
         # Forward pass
-        pred = abs(model(X))
+        pred = abs(model(X).squeeze(0).softmax(0))
         #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
         loss_value = loss_func(pred, y)
