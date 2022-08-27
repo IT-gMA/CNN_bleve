@@ -30,10 +30,10 @@ def test(dataloader, model, loss_func):
             X, y = X.to(DEVICE), y.to(DEVICE)
             pred = model(X)
             #test_loss += loss_func(pred, y).item()
-            test_loss += loss_func(pred.squeeze(), y).item()
+            test_loss += loss_func(pred, y).item()
 
     test_loss /= num_batches
-    mape = mean_absolute_percentage_error(y, pred.squeeze())
+    mape = mean_absolute_percentage_error(y, pred)
     rmse = RMSELoss(y, pred)
     print(f"\nTest Error: \n rmse: {rmse:>0.4f}, mape: {mape:>0.4f}, Avg loss: {test_loss:>8f} \n")
 
