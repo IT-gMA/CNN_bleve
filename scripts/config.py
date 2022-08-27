@@ -5,11 +5,11 @@ LEARNING_RATE = 0.000598419915061102
 WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
 BATCH_SIZE = 512
-NUM_ROW = 30
 
 # Image format
+NUM_ROW = 30
 NUM_COLUMN = 30
-NUM_EPOCHS = 120    # number of epochs to train for
+NUM_EPOCHS = 200    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mps')

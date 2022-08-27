@@ -49,7 +49,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         X, y = X.to(DEVICE), y.to(DEVICE)
 
         # Forward pass
-        pred = abs(model(X).squeeze(0).softmax(0))
+        pred = model(X)
         #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
         loss_value = loss_func(pred, y)
@@ -66,6 +66,7 @@ def train(train_dataloader, model, loss_func, optimiser):
             mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
+            print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
@@ -91,12 +92,11 @@ def validation(val_dataloader, model, loss_func):
 def main() -> object:
     train_dataloader, validation_dataloader, test_loader = dataset_import()
     model = create_model().to(DEVICE)
-    model = model.train()
     print(model)
     # Get the model parameters: put each of the model's parameter value into a list
-    params = [p for p in model.parameters() if p.requires_grad]
+    #params = [p for p in model.parameters() if p.requires_grad]
     loss_func, optimiser = model_param_tweaking(model)
-    optimiser = torch.optim.AdamW(params, lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+    #optimiser = torch.optim.AdamW(params, lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 
     epochs = NUM_EPOCHS
     for i in range(epochs):
