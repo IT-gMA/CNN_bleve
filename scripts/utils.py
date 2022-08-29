@@ -58,7 +58,7 @@ def read_img(tensor=0):
     for img in img_paths:
         img_name = get_gas_name(img)
         image_names.append(img_name)
-        #print(f"reading {img_name}")
+        print(f"reading {img_name}")
 
         bleve_img = cv2.imread(img)
         # Resize each image to its intended size after converted from tabular data form

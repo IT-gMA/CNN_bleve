@@ -5,8 +5,8 @@ LEARNING_RATE = 0.000598419915061102
 MIN_LEARNING_RATE = 0.000598419915061102
 WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
-BATCH_SIZE = 512
-VAL_BATCHSIZE = 256
+BATCH_SIZE = 64
+VAL_BATCHSIZE = 32
 
 # Image format
 NUM_ROW = 30
@@ -18,14 +18,14 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mp
 print('Running on {}'.format(DEVICE))
 
 # Dataset directory: images and output
-OUTPUT_FILE = '../datafull/outputs/outputs.txt'
-IMG_DIR = '../datafull'
-SAVE_IMG_DIR = '../perma_data_full'
-SAVE_OUTPUT_DIR = '../perma_data_full/outputs/outputs.txt'
+OUTPUT_FILE = '../data/outputs/outputs.txt'
+IMG_DIR = '../data'
+SAVE_IMG_DIR = '../perma_data'
+SAVE_OUTPUT_DIR = '../perma_data/outputs/outputs.txt'
 
 # Dataset split
-TRAIN_RATIO = 0.7
-VAL_RATIO = 0.15
+TRAIN_RATIO = 0.75
+VAL_RATIO = 0.10
 TEST_RATIO = 0.15
 
 NUM_WORKERS = 0
@@ -37,7 +37,3 @@ VISUALIZE_TRANSFORMED_IMAGES = False
 OUT_DIR = '../outputs'
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
-
-CONF_THRESHOLD = 0.05
-MAP_IOU_THRESH = 0.5
-NMS_IOU_THRESH = 0.45
