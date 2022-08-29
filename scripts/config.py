@@ -20,6 +20,8 @@ print('Running on {}'.format(DEVICE))
 # Dataset directory: images and output
 OUTPUT_FILE = '../data/outputs/outputs.txt'
 IMG_DIR = '../data'
+SAVE_IMG_DIR = '../perma_data'
+SAVE_OUTPUT_DIR = '../perma_data/outputs/outputs.txt'
 
 # Dataset split
 TRAIN_RATIO = 0.7

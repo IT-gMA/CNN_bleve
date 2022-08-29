@@ -8,7 +8,7 @@ def retrieve_dataset():
     """Dataset retrived is in the form (Torch tensor):
         [0]: image
         [1]: corresponding output value"""
-    dataset = utils.create_raw_dataset()
+    dataset = utils.create_raw_dataset(tensor=1)
 
     num_train = int(len(dataset) * TRAIN_RATIO)
     num_val = int(len(dataset) * VAL_RATIO)

@@ -69,7 +69,7 @@ def train(train_dataloader, model, loss_func, optimiser):
             mape = mean_absolute_percentage_error(y, pred.squeeze())
             rmse = RMSELoss(y, pred.squeeze())
             loss_value, current = loss_value.item(), batch * len(X)
-            #print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
+            print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
     return total_loss
@@ -93,7 +93,7 @@ def validation(val_dataloader, model, loss_func):
         mape = mean_absolute_percentage_error(y, pred.squeeze())
         rmse = RMSELoss(y, pred.squeeze())
         loss_value, current = loss_value.item(), batch * len(X)
-        print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
+        #print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
