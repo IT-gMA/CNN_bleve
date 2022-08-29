@@ -31,8 +31,8 @@ def read_output_txt(tensor=0):
         outputs = f.readlines()
         for output in outputs:
             output = float(output[:-1])
-            if tensor == 1:
-                print(f"reading output: {output}")
+            '''if tensor == 1:
+                print(f"reading output: {output}")'''
             output_list.append(output)
 
     if tensor == 1:
@@ -58,14 +58,14 @@ def read_img(tensor=0):
     for img in img_paths:
         img_name = get_gas_name(img)
         image_names.append(img_name)
-        print(f"reading {img_name}")
+        #print(f"reading {img_name}")
 
         bleve_img = cv2.imread(img)
         # Resize each image to its intended size after converted from tabular data form
         #bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
         if tensor == 1:
-            #bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
+            bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
             bleve_img = np.float32(bleve_img)
             bleve_img = transform(bleve_img)
             #print(bleve_img.shape)

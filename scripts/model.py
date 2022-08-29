@@ -10,7 +10,8 @@ def create_model():
 
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, 1)
-    model.dropout = nn.Dropout(DROPOUT)
+    model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    #model.dropout = nn.Dropout(DROPOUT)
     '''model.layer4[1].relu = nn.Softmax()
     model.layer4[2].relu = nn.Softmax()'''
 
