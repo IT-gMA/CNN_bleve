@@ -62,7 +62,7 @@ def read_img(tensor=0):
 
         bleve_img = cv2.imread(img)
         # Resize each image to its intended size after converted from tabular data form
-        bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+        #bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
         if tensor == 1:
             #bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
