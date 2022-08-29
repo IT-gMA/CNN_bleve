@@ -5,7 +5,7 @@ from dataset import dataset_import
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
-from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE
+from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE, MODEL_NAME
 import torch.nn.functional as F
 import torchvision
 from model import create_model
@@ -31,7 +31,7 @@ def test(dataloader, model, loss_func):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(DEVICE), y.to(DEVICE)
-            pred = model(X).squeeze()
+            pred = get_predictions(X, model)
             #test_loss += loss_func(pred, y).item()
             test_loss += loss_func(pred, y).item()
 
@@ -51,8 +51,8 @@ def train(train_dataloader, model, loss_func, optimiser):
         X, y = X.to(DEVICE), y.to(DEVICE)
 
         # Forward pass
-        pred = model(X).squeeze()
-        #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
+        pred = get_predictions(X, model)
+        print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
         loss_value = loss_func(pred, y)
         if DEVICE == "mps":
@@ -83,7 +83,7 @@ def validation(val_dataloader, model, loss_func):
     for batch, (X, y) in enumerate(val_dataloader):
         # Forward pass
         X, y = X.to(DEVICE), y.to(DEVICE)
-        pred = model(X).squeeze()
+        pred = get_predictions(X, model)
 
         loss_value = loss_func(pred, y)
         if DEVICE == "mps":
@@ -95,6 +95,15 @@ def validation(val_dataloader, model, loss_func):
         loss_value, current = loss_value.item(), batch * len(X)
         #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
+
+
+def get_predictions(input, model):
+    if MODEL_NAME == "inceptionv3":
+        predictions = model(input)[0].squeeze()
+    else:
+        predictions = model(input).squeeze()
+
+    return predictions
 
 
 def main() -> object:

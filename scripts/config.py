@@ -5,15 +5,16 @@ LEARNING_RATE = 0.000598419915061102
 MIN_LEARNING_RATE = 0.000598419915061102
 WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
-BATCH_SIZE = 64
-VAL_BATCHSIZE = 32
+BATCH_SIZE = 4
+VAL_BATCHSIZE = 4
 
 # Image format
-NUM_ROW = 30
-NUM_COLUMN = 30
+NUM_ROW = 224
+NUM_COLUMN = 224
 NUM_EPOCHS = 400    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
+MODEL_NAME = "inceptionv3"
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mps')
 print('Running on {}'.format(DEVICE))
 
