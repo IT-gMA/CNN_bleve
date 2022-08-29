@@ -18,8 +18,8 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mp
 print('Running on {}'.format(DEVICE))
 
 # Dataset directory: images and output
-OUTPUT_FILE = '../data_full/outputs/outputs.txt'
-IMG_DIR = '../data_full'
+OUTPUT_FILE = '../datafull/outputs/outputs.txt'
+IMG_DIR = '../datafull'
 SAVE_IMG_DIR = '../perma_data_full'
 SAVE_OUTPUT_DIR = '../perma_data_full/outputs/outputs.txt'
 
