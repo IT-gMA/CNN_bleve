@@ -31,13 +31,13 @@ def test(dataloader, model, loss_func):
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(DEVICE), y.to(DEVICE)
-            pred = model(X)
+            pred = model(X).squeeze()
             #test_loss += loss_func(pred, y).item()
-            test_loss += loss_func(pred.squeeze(), y).item()
+            test_loss += loss_func(pred, y).item()
 
     test_loss /= num_batches
-    mape = mean_absolute_percentage_error(y, pred.squeeze())
-    rmse = RMSELoss(y, pred.squeeze())
+    mape = mean_absolute_percentage_error(y, pred)
+    rmse = RMSELoss(y, pred)
     print(f"\nTest Error: \n rmse: {rmse:>0.4f}, mape: {mape:>0.4f}, Avg loss: {test_loss:>8f} \n")
 
 
@@ -51,10 +51,10 @@ def train(train_dataloader, model, loss_func, optimiser):
         X, y = X.to(DEVICE), y.to(DEVICE)
 
         # Forward pass
-        pred = model(X)
+        pred = model(X).squeeze()
         #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
-        loss_value = loss_func(pred.squeeze(), y)
+        loss_value = loss_func(pred, y)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
@@ -66,10 +66,10 @@ def train(train_dataloader, model, loss_func, optimiser):
         total_loss += loss_value
 
         if batch % 100 == 0:
-            mape = mean_absolute_percentage_error(y, pred.squeeze())
-            rmse = RMSELoss(y, pred.squeeze())
+            mape = mean_absolute_percentage_error(y, pred)
+            rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
-            print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
+            print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
     return total_loss
@@ -83,17 +83,17 @@ def validation(val_dataloader, model, loss_func):
     for batch, (X, y) in enumerate(val_dataloader):
         # Forward pass
         X, y = X.to(DEVICE), y.to(DEVICE)
-        pred = model(X)
+        pred = model(X).squeeze()
 
-        loss_value = loss_func(pred.squeeze(), y)
+        loss_value = loss_func(pred, y)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
 
-        mape = mean_absolute_percentage_error(y, pred.squeeze())
-        rmse = RMSELoss(y, pred.squeeze())
+        mape = mean_absolute_percentage_error(y, pred)
+        rmse = RMSELoss(y, pred)
         loss_value, current = loss_value.item(), batch * len(X)
-        #print("pred: {}\n---------------\ntru: {}\n".format(pred.squeeze(), y))
+        #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
