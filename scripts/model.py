@@ -22,6 +22,7 @@ def create_model():
 
         num_features = model.fc.in_features
         model.fc = nn.Linear(num_features, 1)
+        model.AuxLogits.fc = nn.Linear(model.AuxLogits.fc.in_features, 1)
     else:
         Exception("Invalid model's name")
 
