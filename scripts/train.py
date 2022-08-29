@@ -52,7 +52,7 @@ def train(train_dataloader, model, loss_func, optimiser):
 
         # Forward pass
         pred = get_predictions(X, model)
-        print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
+        #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
         loss_value = loss_func(pred, y)
         if DEVICE == "mps":
