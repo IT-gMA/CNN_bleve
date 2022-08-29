@@ -69,8 +69,8 @@ def train(train_dataloader, model, loss_func, optimiser):
             mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
-            print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
-            print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
+            print("pred: {}\ntru: {}".format(pred, y))
+            print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}\n")
 
     return total_loss
 
@@ -114,7 +114,7 @@ def main() -> object:
 
     epochs = NUM_EPOCHS
     for i in range(epochs):
-        print("Epoch {}\n__________________________________________".format(i + 1))
+        print("Epoch {}\n_________________________________________________________________".format(i + 1))
         #train_model(train_dataloader, model, loss_func, optimiser)
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         lr_scheduler.step(train_loss)
@@ -122,6 +122,8 @@ def main() -> object:
             print("-------------------------------------------------------------------------------")
             validation(validation_dataloader, model, loss_func)
             print("-------------------------------------------------------------------------------\n")
+
+        print("_________________________________________________________________________________________")
 
     print("Completed")
 

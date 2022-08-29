@@ -52,8 +52,7 @@ def read_img(tensor=0):
         transform = torchvision.transforms.ToTensor()
 
     img_paths = glob.glob("{}/*{}".format(img_dir, FILE_EXTENSION))
-    if tensor == 0:
-        img_paths = natsorted(img_paths, key=lambda y: y.lower())   # Sort the images in alphanumerical order
+    img_paths = natsorted(img_paths, key=lambda y: y.lower())   # Sort the images in alphanumerical order
 
     for img in img_paths:
         img_name = get_gas_name(img)
@@ -65,7 +64,7 @@ def read_img(tensor=0):
         #bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
         if tensor == 1:
-            #bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+            bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
             #bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
             bleve_img = np.float32(bleve_img)
             bleve_img = transform(bleve_img)
