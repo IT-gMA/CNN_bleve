@@ -23,13 +23,17 @@ def model_param_tweaking(model):
     return loss_func, optimiser, scheduler
 
 
-def test(dataloader, model, loss_func):
+def test(test_dataloader, model, loss_func):
     print("Final testing")
-    size = len(dataloader.dataset)
+    size = len(test_dataloader.dataset)
+    i = 0
+    mape_sum = 0
+    rmse_sum = 0
+    loss_sum = 0
 
-    # Start final testing
+    # Start model evaluation
     model.eval()
-    for batch, (X, y) in enumerate(dataloader):
+    for batch, (X, y) in enumerate(test_dataloader):
         # Forward pass
         X, y = X.to(DEVICE), y.to(DEVICE)
         pred = get_predictions(X, model)
@@ -42,9 +46,16 @@ def test(dataloader, model, loss_func):
         mape = mean_absolute_percentage_error(y, pred)
         rmse = RMSELoss(y, pred)
         loss_value, current = loss_value.item(), batch * len(X)
-        print("pred: {}\ntru: {}".format(pred, y))
+        '''print("pred: {}\ntru: {}".format(pred, y))
         print(
-            f"Test:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
+            f"Test:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")'''
+
+        loss_sum += loss_value
+        mape_sum += mape
+        rmse_sum += rmse
+        i += 1
+    print(
+        f"Test Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse / i:>0.4f}    avg_mape: {mape / i:>0.4f}")
 
 
 def train(train_dataloader, model, loss_func, optimiser):
@@ -58,7 +69,6 @@ def train(train_dataloader, model, loss_func, optimiser):
 
         # Forward pass
         pred = get_predictions(X, model)
-        #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
 
         loss_value = loss_func(pred, y)
         if DEVICE == "mps":
@@ -83,6 +93,10 @@ def train(train_dataloader, model, loss_func, optimiser):
 
 def validation(val_dataloader, model, loss_func):
     size = len(val_dataloader.dataset)
+    i = 0
+    mape_sum = 0
+    rmse_sum = 0
+    loss_sum = 0
 
     # Start model evaluation
     model.eval()
@@ -101,6 +115,13 @@ def validation(val_dataloader, model, loss_func):
         loss_value, current = loss_value.item(), batch * len(X)
         print("pred: {}\ntru: {}".format(pred, y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
+
+        loss_sum += loss_value
+        mape_sum += mape
+        rmse_sum += rmse
+        i += 1
+    print(
+        f"Validation Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse/i:>0.4f}    avg_mape: {mape/i:>0.4f}")
 
 
 def get_predictions(input, model):
