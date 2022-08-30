@@ -151,7 +151,7 @@ def get_predictions(input_data, model):
 
 
 def perform_inference():
-    model = load_model(LOAD_MODEL_LOCATION).to(DEVICE)
+    model = load_model(LOAD_MODEL_LOCATION)
     dataloader = dataset_import(inference=True)
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
     model.eval()
@@ -211,3 +211,4 @@ def main() -> object:
 
 if __name__ == '__main__':
     main()
+    #perform_inference()

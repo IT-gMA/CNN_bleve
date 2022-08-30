@@ -5,15 +5,15 @@ from torch import nn
 from config import DROPOUT, DEVICE, MODEL_NAME
 
 
-def create_model():
+def create_model(new_model=True):
     if MODEL_NAME == "resnet50" or MODEL_NAME == "resnet18" or MODEL_NAME == "resnet34":
         # Resnet50
         if MODEL_NAME == "resnet50":
-            model = models.resnet50(pretrained=True)
+            model = models.resnet50(pretrained=new_model)
         elif MODEL_NAME == "resnet34":
-            model = models.resnet34(pretrained=True)
+            model = models.resnet34(pretrained=new_model)
         else:
-            model = models.resnet18(pretrained=True)
+            model = models.resnet18(pretrained=new_model)
 
         num_features = model.fc.in_features
 
@@ -26,7 +26,7 @@ def create_model():
 
     elif MODEL_NAME == "efficientnet_b7":
         # Efficientnet_b7
-        model = models.efficientnet_b7(pretrained=True)
+        model = models.efficientnet_b7(pretrained=new_model)
         num_features = model.classifier[1].in_features
         #model.classifier[1] = nn.Linear(model.classifier[1].in_features, 1)
         model.classifier = nn.Sequential(nn.Dropout(0.5),
@@ -38,7 +38,7 @@ def create_model():
 
     elif MODEL_NAME == "inceptionv3":
         # Inceptionv3
-        model = models.inception_v3(pretrained=True)
+        model = models.inception_v3(pretrained=new_model)
 
         num_features = model.fc.in_features
         #model.fc = nn.Linear(num_features, 1)

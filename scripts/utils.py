@@ -132,8 +132,9 @@ def save_model(model, save_from_val=False):
 
 
 def load_model(saved_location):
-    model = create_model()
-    model.load_state_dict(torch.load(saved_location))
+    ckpt = torch.load(saved_location, map_location=DEVICE)
+    model = create_model(False)
+    model.load_state_dict(ckpt)
     return model
 
 
