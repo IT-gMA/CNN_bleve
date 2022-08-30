@@ -15,7 +15,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 
 def model_param_tweaking(model):
-    loss_func = nn.MSELoss(reduction="sum")
+    loss_func = nn.MSELoss()
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
                                                            factor=0.1, patience=16, threshold=0.0001,
@@ -24,21 +24,27 @@ def model_param_tweaking(model):
 
 
 def test(dataloader, model, loss_func):
+    print("Final testing")
     size = len(dataloader.dataset)
-    num_batches = len(dataloader)
-    model.eval()  # Perform evaluation
-    test_loss, correct = 0, 0
-    with torch.no_grad():
-        for X, y in dataloader:
-            X, y = X.to(DEVICE), y.to(DEVICE)
-            pred = get_predictions(X, model)
-            #test_loss += loss_func(pred, y).item()
-            test_loss += loss_func(pred, y).item()
 
-    test_loss /= num_batches
-    mape = mean_absolute_percentage_error(y, pred)
-    rmse = RMSELoss(y, pred)
-    print(f"\nTest Error: \n rmse: {rmse:>0.4f}, mape: {mape:>0.4f}, Avg loss: {test_loss:>8f} \n")
+    # Start final testing
+    model.eval()
+    for batch, (X, y) in enumerate(dataloader):
+        # Forward pass
+        X, y = X.to(DEVICE), y.to(DEVICE)
+        pred = get_predictions(X, model)
+
+        loss_value = loss_func(pred, y)
+        if DEVICE == "mps":
+            # mps framework supports float32 instead of 64 unlike cuda
+            loss_value = loss_value.type(torch.float32)
+
+        mape = mean_absolute_percentage_error(y, pred)
+        rmse = RMSELoss(y, pred)
+        loss_value, current = loss_value.item(), batch * len(X)
+        print("pred: {}\ntru: {}".format(pred, y))
+        print(
+            f"Test:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
 def train(train_dataloader, model, loss_func, optimiser):
@@ -69,7 +75,7 @@ def train(train_dataloader, model, loss_func, optimiser):
             mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
-            print("pred: {}\ntru: {}".format(pred, y))
+            #print("pred: {}\ntru: {}".format(pred, y))
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}\n")
 
     return total_loss
@@ -93,7 +99,7 @@ def validation(val_dataloader, model, loss_func):
         mape = mean_absolute_percentage_error(y, pred)
         rmse = RMSELoss(y, pred)
         loss_value, current = loss_value.item(), batch * len(X)
-        #print("pred: {}\n---------------\ntru: {}\n".format(pred, y))
+        print("pred: {}\ntru: {}".format(pred, y))
         print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
 
@@ -115,7 +121,6 @@ def main() -> object:
     epochs = NUM_EPOCHS
     for i in range(epochs):
         print("Epoch {}\n_________________________________________________________________".format(i + 1))
-        #train_model(train_dataloader, model, loss_func, optimiser)
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         lr_scheduler.step(train_loss)
         if i % 5 == 0:
@@ -125,7 +130,8 @@ def main() -> object:
 
         print("_________________________________________________________________________________________")
 
-    print("Completed")
+    print("Training complete")
+    test(test_loader, model, loss_func)
 
     '''model_saved_state = save_model(model)
     model = load_model(model_saved_state)
