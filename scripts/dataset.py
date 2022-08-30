@@ -21,7 +21,7 @@ def retrieve_dataset():
     return train_set, val_set, test_set, num_train, num_val, num_test
 
 
-def dataset_import():
+def dataset_import(inference=False):
     train_dataset, valid_dataset, test_dataset, num_train, num_val, num_test = retrieve_dataset()
 
     train_loader = DataLoader(
@@ -45,8 +45,11 @@ def dataset_import():
         num_workers=NUM_WORKERS
     )
 
-    utils.write_run_configs(num_train, num_val, num_test)
-    return train_loader, validation_loader, test_loader
+    if not inference:
+        utils.write_run_configs(num_train, num_val, num_test)
+        return train_loader, validation_loader, test_loader
+    else:
+        return test_loader
 
 
 if __name__ == '__main__':

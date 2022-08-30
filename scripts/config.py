@@ -51,5 +51,9 @@ SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 LOG_DIR = "../running_logs/resnet50"
 
 
+# load model from
+LOAD_MODEL_LOCATION = ""
+
+
 # the size of tensor arrays being displayed
 NP_FULL_SIZE = False
