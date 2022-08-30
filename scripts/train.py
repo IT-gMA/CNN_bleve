@@ -5,7 +5,7 @@ from dataset import dataset_import
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
-from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE, MODEL_NAME
+from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE, MODEL_NAME, PRINT_TRAIN, PRINT_VAL, PRINT_TEST
 import torch.nn.functional as F
 import torchvision
 from model import create_model
@@ -30,6 +30,7 @@ def test(test_dataloader, model, loss_func):
     mape_sum = 0
     rmse_sum = 0
     loss_sum = 0
+    acc_sum = 0
 
     # Start model evaluation
     model.eval()
@@ -45,17 +46,61 @@ def test(test_dataloader, model, loss_func):
 
         mape = mean_absolute_percentage_error(y, pred)
         rmse = RMSELoss(y, pred)
+        acc = (1.0 - mape) * 100.0
         loss_value, current = loss_value.item(), batch * len(X)
-        '''print("pred: {}\ntru: {}".format(pred, y))
+        '''
+        if PRINT_TEST:
+            print("pred: {}\ntru: {}".format(pred, y))
         print(
-            f"Test:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")'''
+            f"Test:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
+            f"accuracy: {acc:>4f}%")'''
 
         loss_sum += loss_value
         mape_sum += mape
         rmse_sum += rmse
         i += 1
     print(
-        f"Test Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse / i:>0.4f}    avg_mape: {mape / i:>0.4f}")
+        f"Test Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse / i:>0.4f}    avg_mape: {mape / i:>0.4f}"
+        f"avg_accuracy: {acc_sum / i:>4f}%")
+
+
+def validation(val_dataloader, model, loss_func):
+    size = len(val_dataloader.dataset)
+    i = 0
+    mape_sum = 0
+    rmse_sum = 0
+    loss_sum = 0
+    acc_sum = 0
+
+    # Start model evaluation
+    model.eval()
+    for batch, (X, y) in enumerate(val_dataloader):
+        # Forward pass
+        X, y = X.to(DEVICE), y.to(DEVICE)
+        pred = get_predictions(X, model)
+
+        loss_value = loss_func(pred, y)
+        if DEVICE == "mps":
+            # mps framework supports float32 instead of 64 unlike cuda
+            loss_value = loss_value.type(torch.float32)
+
+        mape = mean_absolute_percentage_error(y, pred)
+        rmse = RMSELoss(y, pred)
+        acc = (1.0 - mape) * 100.0
+        loss_value, current = loss_value.item(), batch * len(X)
+        if PRINT_VAL:
+            print("pred: {}\ntru: {}".format(pred, y))
+        print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
+              f"accuracy: {acc:>4f}%")
+
+        loss_sum += loss_value
+        mape_sum += mape
+        rmse_sum += rmse
+        acc_sum += acc
+        i += 1
+    print(
+        f"Validation Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse/i:>0.4f}    avg_mape: {mape/i:>0.4f}"
+        f"avg_accuracy: {acc_sum/i:>4f}%")
 
 
 def train(train_dataloader, model, loss_func, optimiser):
@@ -85,43 +130,12 @@ def train(train_dataloader, model, loss_func, optimiser):
             mape = mean_absolute_percentage_error(y, pred)
             rmse = RMSELoss(y, pred)
             loss_value, current = loss_value.item(), batch * len(X)
-            #print("pred: {}\ntru: {}".format(pred, y))
+            if PRINT_TRAIN:
+                print("pred: {}\ntru: {}".format(pred, y))
+
             print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
 
     return total_loss
-
-
-def validation(val_dataloader, model, loss_func):
-    size = len(val_dataloader.dataset)
-    i = 0
-    mape_sum = 0
-    rmse_sum = 0
-    loss_sum = 0
-
-    # Start model evaluation
-    model.eval()
-    for batch, (X, y) in enumerate(val_dataloader):
-        # Forward pass
-        X, y = X.to(DEVICE), y.to(DEVICE)
-        pred = get_predictions(X, model)
-
-        loss_value = loss_func(pred, y)
-        if DEVICE == "mps":
-            # mps framework supports float32 instead of 64 unlike cuda
-            loss_value = loss_value.type(torch.float32)
-
-        mape = mean_absolute_percentage_error(y, pred)
-        rmse = RMSELoss(y, pred)
-        loss_value, current = loss_value.item(), batch * len(X)
-        print("pred: {}\ntru: {}".format(pred, y))
-        print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
-
-        loss_sum += loss_value
-        mape_sum += mape
-        rmse_sum += rmse
-        i += 1
-    print(
-        f"Validation Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse/i:>0.4f}    avg_mape: {mape/i:>0.4f}")
 
 
 def get_predictions(input, model):
