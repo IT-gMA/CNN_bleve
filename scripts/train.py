@@ -1,17 +1,16 @@
 import torch
 from torch import nn
-import torch.optim as optim
 from dataset import dataset_import
+from utils import save_model, save_running_logs
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
-from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE, MODEL_NAME, PRINT_TRAIN, PRINT_VAL, PRINT_TEST, MSE_REDUCTION
-import torch.nn.functional as F
-import torchvision
+from config import *
 from model import create_model
 
 
-np.set_printoptions(threshold=sys.maxsize)
+if NP_FULL_SIZE:
+    np.set_printoptions(threshold=sys.maxsize)
 
 
 def model_param_tweaking(model):
@@ -21,23 +20,31 @@ def model_param_tweaking(model):
         loss_func = nn.MSELoss()
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
-                                                           factor=0.1, patience=16, threshold=0.0001,
+                                                           factor=0.1, patience=PATIENCE, threshold=0.0001,
                                                            threshold_mode='abs')
     return loss_func, optimiser, scheduler
 
 
-def test(test_dataloader, model, loss_func):
-    print("Final testing")
-    size = len(test_dataloader.dataset)
+def get_best_val_model(curr_mape, best_mape, model):
+    if curr_mape < best_mape:
+        write_info = "Best validation mape is {}, improved from {}".format(curr_mape, best_mape)
+        save_running_logs(write_info)
+        save_model(model, save_from_val=True)
+        return curr_mape
+    else:
+        return best_mape
+
+
+def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, best_mape=100.0):
+    size = len(dataloader)
     i = 0
     mape_sum = 0
     rmse_sum = 0
     loss_sum = 0
     acc_sum = 0
 
-    # Start model evaluation
     model.eval()
-    for batch, (X, y) in enumerate(test_dataloader):
+    for batch, (X, y) in enumerate(dataloader):
         # Forward pass
         X, y = X.to(DEVICE), y.to(DEVICE)
         pred = get_predictions(X, model)
@@ -48,62 +55,48 @@ def test(test_dataloader, model, loss_func):
             loss_value = loss_value.type(torch.float32)
 
         mape = mean_absolute_percentage_error(y, pred)
+
         rmse = RMSELoss(y, pred)
         acc = (1.0 - mape) * 100.0
         loss_value, current = loss_value.item(), batch * len(X)
-        '''
-        if PRINT_TEST:
+        if print_tensor_output:
             print("pred: {}\ntru: {}".format(pred, y))
-        print(
-            f"Test:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
-            f"accuracy: {acc:>4f}%")'''
 
-        loss_sum += loss_value
-        mape_sum += mape
-        rmse_sum += rmse
-        i += 1
-    print(
-        f"Test Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse_sum / i:>0.4f}    avg_mape: {mape_sum / i:>0.4f}"
-        f"avg_accuracy: {acc_sum / i:>4f}%")
-
-
-def validation(val_dataloader, model, loss_func):
-    size = len(val_dataloader.dataset)
-    i = 0
-    mape_sum = 0
-    rmse_sum = 0
-    loss_sum = 0
-    acc_sum = 0
-
-    # Start model evaluation
-    model.eval()
-    for batch, (X, y) in enumerate(val_dataloader):
-        # Forward pass
-        X, y = X.to(DEVICE), y.to(DEVICE)
-        pred = get_predictions(X, model)
-
-        loss_value = loss_func(pred, y)
-        if DEVICE == "mps":
-            # mps framework supports float32 instead of 64 unlike cuda
-            loss_value = loss_value.type(torch.float32)
-
-        mape = mean_absolute_percentage_error(y, pred)
-        rmse = RMSELoss(y, pred)
-        acc = (1.0 - mape) * 100.0
-        loss_value, current = loss_value.item(), batch * len(X)
-        if PRINT_VAL:
-            print("pred: {}\ntru: {}".format(pred, y))
-        print(f"Validation:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
-              f"accuracy: {acc:>4f}%")
+        write_info = f"{mode}:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}    accuracy: {acc:>4f}%"
+        save_running_logs(write_info)
 
         loss_sum += loss_value
         mape_sum += mape
         rmse_sum += rmse
         acc_sum += acc
         i += 1
-    print(
-        f"Validation Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse_sum/i:>0.4f}    avg_mape: {mape_sum/i:>0.4f}"
-        f"avg_accuracy: {acc_sum/i:>4f}%")
+
+    write_info = f"{mode} Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse_sum/i:>0.4f}    avg_mape: {mape_sum/i:>0.4f}  avg_accuracy: {acc_sum/i:>4f}%"
+    save_running_logs(write_info)
+    if mode == "Validation":
+        return mape_sum / i
+
+
+def test(test_dataloader, model, loss_func):
+    print("Final testing")
+    # Start model testing
+    if DEVICE == "cuda":
+        with torch.no_grad():
+            run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
+    else:
+        run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
+
+
+def validation(val_dataloader, model, loss_func, best_mape):
+    # Start model evaluation
+    if DEVICE == "cuda":
+        with torch.no_grad():
+            val_mape = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+    else:
+        val_mape = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+
+    best_mape = get_best_val_model(curr_mape=val_mape, best_mape=best_mape, model=model)
+    return best_mape
 
 
 def train(train_dataloader, model, loss_func, optimiser):
@@ -136,16 +129,17 @@ def train(train_dataloader, model, loss_func, optimiser):
             if PRINT_TRAIN:
                 print("pred: {}\ntru: {}".format(pred, y))
 
-            print(f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}")
+            write_info = f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
+            save_running_logs(write_info)
 
     return total_loss
 
 
-def get_predictions(input, model):
+def get_predictions(input_data, model):
     if MODEL_NAME == "inceptionv3":
-        predictions = model(input)[0].squeeze()
+        predictions = model(input_data)[0].squeeze()
     else:
-        predictions = model(input).squeeze()
+        predictions = model(input_data).squeeze()
 
     return predictions
 
@@ -156,24 +150,32 @@ def main() -> object:
     print(model)
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
+    best_mape = 100.0
+
     epochs = NUM_EPOCHS
     for i in range(epochs):
-        print("___Epoch {}______________________________________________________________________".format(i + 1))
+        write_info = "___Epoch {}______________________________________________________________________".format(i + 1)
+        save_running_logs(write_info)
+
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         lr_scheduler.step(train_loss)
-        print("________________________________________________________________________________\n")
+
+        write_info = "________________________________________________________________________________\n"
+        save_running_logs(write_info)
 
         if i % 5 == 0 and i > 1:
-            print("---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(i+1))
-            validation(validation_dataloader, model, loss_func)
-            print("------------------------------------END OF VALIDATION----------------------------------------\n")
+            write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(i+1)
+            save_running_logs(write_info)
+
+            returned_mape = validation(validation_dataloader, model, loss_func, best_mape)
+            best_mape = returned_mape
+
+            write_info = "------------------------------------END OF VALIDATION----------------------------------------\n"
+            save_running_logs(write_info)
 
     print("Training complete")
+    save_model(model)
     test(test_loader, model, loss_func)
-
-    '''model_saved_state = save_model(model)
-    model = load_model(model_saved_state)
-    perform_prediction(model, test_dataloader)'''
 
 
 if __name__ == '__main__':

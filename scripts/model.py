@@ -6,9 +6,15 @@ from config import DROPOUT, DEVICE, MODEL_NAME
 
 
 def create_model():
-    if MODEL_NAME == "resnet50":
+    if MODEL_NAME == "resnet50" or MODEL_NAME == "resnet18" or MODEL_NAME == "resnet34":
         # Resnet50
-        model = models.resnet50(pretrained=True)
+        if MODEL_NAME == "resnet50":
+            model = models.resnet50(pretrained=True)
+        elif MODEL_NAME == "resnet34":
+            model = models.resnet34(pretrained=True)
+        else:
+            model = models.resnet18(pretrained=True)
+
         num_features = model.fc.in_features
 
         #model.fc = nn.Linear(num_features, 1)

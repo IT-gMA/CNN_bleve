@@ -18,11 +18,11 @@ def retrieve_dataset():
     val_set = dataset[num_train:num_train + num_val - 1]
     test_set = dataset[num_train + num_val: len(dataset) - 1]
 
-    return train_set, val_set, test_set
+    return train_set, val_set, test_set, num_train, num_val, num_test
 
 
 def dataset_import():
-    train_dataset, valid_dataset, test_dataset = retrieve_dataset()
+    train_dataset, valid_dataset, test_dataset, num_train, num_val, num_test = retrieve_dataset()
 
     train_loader = DataLoader(
         dataset=train_dataset,
@@ -45,6 +45,7 @@ def dataset_import():
         num_workers=NUM_WORKERS
     )
 
+    utils.write_run_configs(num_train, num_val, num_test)
     return train_loader, validation_loader, test_loader
 
 
