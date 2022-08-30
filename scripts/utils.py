@@ -6,7 +6,7 @@ import cv2
 import glob, sys
 from natsort import natsorted, ns
 import torch, torchvision
-from config import OUTPUT_FILE, IMG_DIR, NUM_ROW, NUM_COLUMN, FILE_EXTENSION, SAVE_IMG_DIR, SAVE_OUTPUT_DIR
+from config import OUTPUT_FILE, IMG_DIR, NUM_ROW, NUM_COLUMN, FILE_EXTENSION, SAVE_IMG_DIR, SAVE_OUTPUT_DIR, RESCALE
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -64,7 +64,9 @@ def read_img(tensor=0):
         #bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
         if tensor == 1:
-            bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+            if RESCALE:
+                bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+
             #bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
             bleve_img = np.float32(bleve_img)
             bleve_img = transform(bleve_img)
