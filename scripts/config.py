@@ -5,8 +5,8 @@ LEARNING_RATE = 0.000598419915061102
 MIN_LEARNING_RATE = 0.000598419915061102
 WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
-BATCH_SIZE = 2048
-VAL_BATCHSIZE = 1024
+BATCH_SIZE = 4
+VAL_BATCHSIZE = 4
 
 # Image format
 NUM_ROW = 30
@@ -14,15 +14,15 @@ NUM_COLUMN = 30
 NUM_EPOCHS = 2000    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
-MODEL_NAME = "resnet50"
+MODEL_NAME = "inceptionv3"
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mps')
 print('Running on {}'.format(DEVICE))
 
 # Dataset directory: images and output
-OUTPUT_FILE = '../data/outputs/outputs.txt'
-IMG_DIR = '../data'
-SAVE_IMG_DIR = '../perma_data_full'
-SAVE_OUTPUT_DIR = '../perma_data_full/outputs/outputs.txt'
+OUTPUT_FILE = '../dataset/data/outputs/outputs.txt'
+IMG_DIR = '../dataset/data'
+SAVE_IMG_DIR = '../dataset_run/perma_data'
+SAVE_OUTPUT_DIR = '../dataset_run/perma_data/outputs/outputs.txt'
 
 # Dataset split
 TRAIN_RATIO = 0.75
