@@ -123,7 +123,7 @@ def check_data_vs_output_quantity(img_list, output_list):
 
 def save_model(model, save_from_val=False):
     if not save_from_val:
-        save_location = "{}/{}_{}_final_model{}".format(SAVED_MODEL_DIR, datetime.datetime.now(), SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+        save_location = "{}/{}_final_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
     else:
         save_location = "{}/{}_best_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
     torch.save(model.state_dict(), save_location)
@@ -140,7 +140,7 @@ def load_model(saved_location):
 def save_running_logs(info):
     print(info)
 
-    log_file_name = SAVED_MODEL_NAME.replace(".pth", "")
+    log_file_name = SAVED_MODEL_NAME.replace(".pt", "")
     save_location = "{}/{}.txt".format(LOG_DIR, log_file_name)
     with open(save_location, 'a') as f:
         f.write(f"{info}\n")
