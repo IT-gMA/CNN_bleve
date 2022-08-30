@@ -63,7 +63,7 @@ def test(test_dataloader, model, loss_func):
         rmse_sum += rmse
         i += 1
     print(
-        f"Test Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse / i:>0.4f}    avg_mape: {mape / i:>0.4f}"
+        f"Test Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse_sum / i:>0.4f}    avg_mape: {mape_sum / i:>0.4f}"
         f"avg_accuracy: {acc_sum / i:>4f}%")
 
 
@@ -102,7 +102,7 @@ def validation(val_dataloader, model, loss_func):
         acc_sum += acc
         i += 1
     print(
-        f"Validation Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse/i:>0.4f}    avg_mape: {mape/i:>0.4f}"
+        f"Validation Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse_sum/i:>0.4f}    avg_mape: {mape_sum/i:>0.4f}"
         f"avg_accuracy: {acc_sum/i:>4f}%")
 
 
