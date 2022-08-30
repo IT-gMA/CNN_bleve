@@ -8,7 +8,6 @@ import numpy as np
 from config import *
 from model import create_model
 
-
 if NP_FULL_SIZE:
     np.set_printoptions(threshold=sys.maxsize)
 
@@ -19,9 +18,16 @@ def model_param_tweaking(model):
     else:
         loss_func = nn.MSELoss()
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
-                                                           factor=0.1, patience=PATIENCE, threshold=0.0001,
-                                                           threshold_mode='abs')
+
+    scheduler = None
+    if SCHEDULED:
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
+                                                               factor=0.1, patience=PATIENCE, threshold=0.0001,
+                                                               threshold_mode='abs')
+    if SCHEDULED and VARRY_LR:
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
+                                                               factor=0.1, patience=PATIENCE, threshold=0.0001,
+                                                               threshold_mode='abs', min_lr=MIN_LEARNING_RATE)
     return loss_func, optimiser, scheduler
 
 
@@ -71,7 +77,7 @@ def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, bes
         acc_sum += acc
         i += 1
 
-    write_info = f"{mode} Summary:  avg_loss: {loss_sum/i:>7f}   avg_rmse: {rmse_sum/i:>0.4f}    avg_mape: {mape_sum/i:>0.4f}  avg_accuracy: {acc_sum/i:>4f}%"
+    write_info = f"{mode} Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse_sum / i:>0.4f}    avg_mape: {mape_sum / i:>0.4f}  avg_accuracy: {acc_sum / i:>4f}%"
     save_running_logs(write_info)
     if mode == "Validation":
         return mape_sum / i
@@ -158,13 +164,15 @@ def main() -> object:
         save_running_logs(write_info)
 
         train_loss = train(train_dataloader, model, loss_func, optimiser)
-        lr_scheduler.step(train_loss)
+        if SCHEDULED:
+            lr_scheduler.step(train_loss)
 
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info)
 
         if i % 5 == 0 and i > 1:
-            write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(i+1)
+            write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(
+                i + 1)
             save_running_logs(write_info)
 
             returned_mape = validation(validation_dataloader, model, loss_func, best_mape)
