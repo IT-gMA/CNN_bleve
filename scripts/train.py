@@ -120,9 +120,11 @@ def main() -> object:
 
     epochs = NUM_EPOCHS
     for i in range(epochs):
-        print("Epoch {}\n_________________________________________________________________".format(i + 1))
+        print("Epoch {}_______________________________________________________________________".format(i + 1))
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         lr_scheduler.step(train_loss)
+        print("_______________________________________________________________________________")
+        
         if i % 5 == 0 and i > 1:
             print("---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(i+1))
             validation(validation_dataloader, model, loss_func)
