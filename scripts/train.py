@@ -124,11 +124,11 @@ def main() -> object:
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         lr_scheduler.step(train_loss)
         if i % 5 == 0:
-            print("-------------------------------------------------------------------------------")
+            print("---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(i+1))
             validation(validation_dataloader, model, loss_func)
             print("-------------------------------------------------------------------------------\n")
 
-        print("_________________________________________________________________________________________")
+        print("______________________________________END OF VALIDATION________________________________________")
 
     print("Training complete")
     test(test_loader, model, loss_func)
