@@ -5,7 +5,7 @@ from dataset import dataset_import
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
-from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE, MODEL_NAME, PRINT_TRAIN, PRINT_VAL, PRINT_TEST
+from config import LEARNING_RATE, MIN_LEARNING_RATE, WEIGHT_DECAY, NUM_EPOCHS, DEVICE, MODEL_NAME, PRINT_TRAIN, PRINT_VAL, PRINT_TEST, MSE_REDUCTION
 import torch.nn.functional as F
 import torchvision
 from model import create_model
@@ -15,7 +15,10 @@ np.set_printoptions(threshold=sys.maxsize)
 
 
 def model_param_tweaking(model):
-    loss_func = nn.MSELoss()
+    if MSE_REDUCTION == "mean" or MSE_REDUCTION == "sum":
+        loss_func = nn.MSELoss(reduction=MSE_REDUCTION)
+    else:
+        loss_func = nn.MSELoss()
     optimiser = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, mode='min',
                                                            factor=0.1, patience=16, threshold=0.0001,

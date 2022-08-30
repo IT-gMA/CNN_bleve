@@ -43,7 +43,7 @@ def create_model():
                                  nn.LeakyReLU(),
                                  nn.Linear(32, 1))
     else:
-        Exception("Invalid model's name")
+        Exception(f"{MODEL_NAME} is an invalid model's name")
 
     # model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     # model.dropout = nn.Dropout(DROPOUT)
