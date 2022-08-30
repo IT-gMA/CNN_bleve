@@ -123,7 +123,7 @@ def main() -> object:
         print("Epoch {}\n_________________________________________________________________".format(i + 1))
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         lr_scheduler.step(train_loss)
-        if i % 5 == 0:
+        if i % 5 == 0 and i > 1:
             print("---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(i+1))
             validation(validation_dataloader, model, loss_func)
             print("------------------------------------END OF VALIDATION----------------------------------------\n")
