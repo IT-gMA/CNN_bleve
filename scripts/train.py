@@ -1,3 +1,5 @@
+import copy
+
 import torch
 from torch import nn
 from dataset import dataset_import
@@ -176,6 +178,7 @@ def perform_inference():
 def main() -> object:
     train_dataloader, validation_dataloader, test_loader = dataset_import()
     model = create_model().to(DEVICE)
+    best_model = copy.deepcopy(model)
     print(model)
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
@@ -199,6 +202,8 @@ def main() -> object:
             save_running_logs(write_info)
 
             returned_mape = validation(validation_dataloader, model, loss_func, best_mape)
+            if best_mape > returned_mape:
+                best_model = copy.deepcopy(model)
             best_mape = returned_mape
 
             write_info = "------------------------------------END OF VALIDATION----------------------------------------\n"
@@ -207,6 +212,11 @@ def main() -> object:
     print("Training complete")
     save_model(model)
     test(test_loader, model, loss_func)
+
+    # Now run with best model
+    loss_func, optimiser, lr_scheduler = model_param_tweaking(best_model)
+    save_running_logs("Running with best val model:")
+    test(test_loader, best_model, loss_func)
 
 
 if __name__ == '__main__':
