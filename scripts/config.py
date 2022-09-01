@@ -2,7 +2,7 @@ import torch
 
 # Configure the training process
 LEARNING_RATE = 1e-3
-MIN_LEARNING_RATE = 0.0005198419915061102
+MIN_LEARNING_RATE = 0.0005598419915061102
 WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
 VARRY_LR = True
@@ -19,7 +19,7 @@ PRINT_TEST = False
 RESCALE = True
 NUM_ROW = 30
 NUM_COLUMN = 30
-NUM_EPOCHS = 10000    # number of epochs to train for
+NUM_EPOCHS = 12000    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet34"
@@ -29,30 +29,30 @@ print('Running on {}'.format(DEVICE))
 # Dataset directory: images and output
 OUTPUT_FILE = '../dataset/data/outputs/outputs.txt'
 IMG_DIR = '../dataset/data'
-SAVE_IMG_DIR = '../dataset_run/perma_data_full'
-SAVE_OUTPUT_DIR = '../dataset_run/perma_data_full/outputs/outputs.txt'
+SAVE_IMG_DIR = '../dataset_run/bleve_orderd_e0v2'
+SAVE_OUTPUT_DIR = '../dataset_run/bleve_orderd_e0v2/outputs/outputs.txt'
 
 # Dataset split
-TRAIN_RATIO = 0.78
-VAL_RATIO = 0.12
+TRAIN_RATIO = 0.80
+VAL_RATIO = 0.10
 TEST_RATIO = 0.10
 
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnetv3"
-SAVED_MODEL_NAME = "restnetv3_46k"
+SAVED_MODEL_DIR = "../saved_models/resnet34v5"
+SAVED_MODEL_NAME = "resnet34v5"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnetv3"
+LOG_DIR = "../running_logs/resnet34v5"
 
 
 # load model from
-LOAD_MODEL_LOCATION = "../saved_models/resnet34v2/restnet34v2_46k_best_model.pt"
+LOAD_MODEL_LOCATION = "../saved_models/resnet34v4/restnet34v5_best_model.pt"
 
 
 # the size of tensor arrays being displayed

@@ -175,10 +175,24 @@ def perform_inference():
         print(f"Inference results: rmse: {rmse:>0.4f}    mape: {mape:>0.4f}    accuracy: {acc:>4f}%")
 
 
+def clone_model(og, clone):
+    mp = list(og.parameters())
+    mcp = list(clone.parameters())
+    n = len(mp)
+    for i in range(0, n):
+        mp[i].data[:] = mcp[i].data[:]
+    return clone
+
+
 def main() -> object:
     train_dataloader, validation_dataloader, test_loader = dataset_import()
-    model = create_model().to(DEVICE)
-    best_model = copy.deepcopy(model)
+    model = create_model(False).to(DEVICE)
+    #model.load_state_dict(torch.load("../saved_models/resnet34v5/restnet34v5_best_model.pt"))
+    #best_model = copy.deepcopy(model)
+
+    best_model = create_model().to(DEVICE)
+    #clone_model(model, best_model)
+
     print(model)
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
@@ -202,8 +216,9 @@ def main() -> object:
             save_running_logs(write_info)
 
             returned_mape = validation(validation_dataloader, model, loss_func, best_mape)
+
             if best_mape > returned_mape:
-                best_model = copy.deepcopy(model)
+                best_model = clone_model(model, best_model)
             best_mape = returned_mape
 
             write_info = "------------------------------------END OF VALIDATION----------------------------------------\n"
