@@ -14,9 +14,9 @@ def retrieve_dataset():
     num_val = int(len(dataset) * VAL_RATIO)
     num_test = len(dataset) - num_train - num_val
 
-    train_set = dataset[0:num_train - 1]
-    val_set = dataset[num_train:num_train + num_val - 1]
-    test_set = dataset[num_train + num_val: len(dataset) - 1]
+    train_set = dataset[0:num_train]
+    val_set = dataset[num_train:num_train + num_val]
+    test_set = dataset[num_train + num_val: len(dataset)]
 
     return train_set, val_set, test_set, num_train, num_val, num_test
 
@@ -54,8 +54,8 @@ def dataset_import(inference=False):
 
 if __name__ == '__main__':
     train_loader, valid_loader, test_loader = dataset_import()
-    for X, y in train_loader:
+    '''for X, y in train_loader:
         print("Shape of X [N, C, H, W]: ", X.shape)
         print("Shape of y: ", y.shape, y.dtype)
-        break
-    print(train_loader.dataset)
+        break'''
+    #print(train_loader.dataset)

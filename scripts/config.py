@@ -29,8 +29,8 @@ print('Running on {}'.format(DEVICE))
 # Dataset directory: images and output
 OUTPUT_FILE = '../dataset/data/outputs/outputs.txt'
 IMG_DIR = '../dataset/data'
-SAVE_IMG_DIR = '../dataset_run/bleve_orderd_e0v2'
-SAVE_OUTPUT_DIR = '../dataset_run/bleve_orderd_e0v2/outputs/outputs.txt'
+SAVE_IMG_DIR = '../dataset_run/bleve_orderd_e0'
+SAVE_OUTPUT_DIR = '../dataset_run/bleve_orderd_e0/outputs/outputs.txt'
 
 # Dataset split
 TRAIN_RATIO = 0.80
