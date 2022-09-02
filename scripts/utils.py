@@ -123,7 +123,8 @@ def create_raw_dataset(tensor=0):
             dataset.append([img_list[i], output_list[i]])
 
     # OPTIONAL to order the dataset
-    dataset = order_liquid_dist_features(dataset)
+    if ORDER:
+        dataset = order_liquid_dist_features(dataset)
 
     if tensor == 0:
         random.shuffle(dataset)
@@ -168,8 +169,10 @@ def save_running_logs(info):
 
 def write_run_configs(n_train, n_val, n_test):
     run_config0 = "Time: {}\nDataset directory: {}\nModel: {}\nLearning rate: {}\n".format(datetime.datetime.now(), SAVE_IMG_DIR, MODEL_NAME, LEARNING_RATE)
+    if SCHEDULED:
+        run_config0 = f"{run_config0}\nMin learning rate: {MIN_LEARNING_RATE}"
     run_config1 = "Weight decay: {}\nDrop out: {}\n Patience: {}\n Number of running epochs: {}\n".format(WEIGHT_DECAY, DROPOUT, PATIENCE, NUM_EPOCHS)
-    run_config2 = "Train batch size: {}\nValidation batch size: {}\n".format(BATCH_SIZE, VAL_BATCHSIZE)
+    run_config2 = "MSE Reduction: {}\nTrain batch size: {}\nValidation batch size: {}\n".format(MSE_REDUCTION, BATCH_SIZE, VAL_BATCHSIZE)
     run_config3 = "Train-Val_Test ratio: {}-{}-{}\n".format(TRAIN_RATIO, VAL_RATIO, TEST_RATIO)
     run_config4 = "     Number of train images: {}\n".format(n_train)
     run_config5 = "     Number of validation images: {}\n".format(n_val)

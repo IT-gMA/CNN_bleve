@@ -37,6 +37,7 @@ TRAIN_RATIO = 0.80
 VAL_RATIO = 0.10
 TEST_RATIO = 0.10
 
+ORDER = True
 NUM_WORKERS = 0
 
 # location to save model and plots
