@@ -12,13 +12,28 @@ from model import create_model
 np.set_printoptions(threshold=sys.maxsize)
 
 
-def collate_fn(batch):
-    """
-    To handle the data loading as different images may have different number
-    of objects and to handle varying size tensors as well. I.e collect/gather training and validation loss
-    values
-    """
-    return tuple(zip(*batch))  # To accumulate
+def order_liquid_dist_features(dataset):
+    '''
+    The purpose of this function is to order the dataset with respect to distance to sensor in ascending order,
+    therefore, each liquid type (Butane or Propane) will follow each other one by one i.e butane the propane the butane ...
+    to ensure training, validation and testing sets have roughly equal liquid type representation
+    '''
+    ordered_dataset = []    # new ordered dataset
+    butanes = dataset[0:22954]      # the first half of the dataset contains on butane
+    propanes = dataset[22954:len(dataset)]      # the second half of the dataset contains on propane
+
+    for a in range(0, 46, 1):       # traverse the row by distance, i.e vist all liquids with distnace = 5 then all liquids with distance = 6 ... 50
+        for i in range(a, len(propanes), 46):
+            if i < len(butanes):    # Since there are more propanes present, we'll arrange the first 499 butanes and 499 propanes first
+                # order: butane and then propane
+                ordered_dataset.append(butanes[i])
+                ordered_dataset.append(propanes[i])
+            else:
+                # the last (500th) propane
+                ordered_dataset.append(propanes[i])
+
+    print(len(ordered_dataset))
+    return ordered_dataset
 
 
 def read_output_txt(tensor=0):
@@ -101,10 +116,14 @@ def create_raw_dataset(tensor=0):
     check_data_vs_output_quantity(img_list, output_list)
 
     for i in range(0, len(output_list)):
+        # given each image has their corresponding output in the correct order
         if tensor == 0:
             dataset.append([img_list[i], image_names[i], output_list[i]])
         else:
             dataset.append([img_list[i], output_list[i]])
+
+    # OPTIONAL to order the dataset
+    dataset = order_liquid_dist_features(dataset)
 
     if tensor == 0:
         random.shuffle(dataset)
@@ -174,6 +193,7 @@ if __name__ == '__main__':
         cv2.imwrite(f"{dataset[i][1]}.png", dataset[i][0])
         cv2.waitKey(0)
         cv2.destroyAllWindows()'''
-    output_txt = read_output_txt()
-    print(output_txt.reshape(-1, 1))
+    #output_txt = read_output_txt()
+    #print(output_txt.reshape(-1, 1))
+    #order_liquid_dist_features(None)
 
