@@ -19,7 +19,7 @@ PRINT_TEST = False
 RESCALE = True
 NUM_ROW = 30
 NUM_COLUMN = 30
-NUM_EPOCHS = 12000    # number of epochs to train for
+NUM_EPOCHS = 25000    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet34"
@@ -40,19 +40,19 @@ TEST_RATIO = 0.10
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet34v5"
-SAVED_MODEL_NAME = "resnet34v5"
+SAVED_MODEL_DIR = "../saved_models/resnet34v6"
+SAVED_MODEL_NAME = "resnet34v6"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet34v5"
+LOG_DIR = "../running_logs/resnet34v6"
 
 
 # load model from
-LOAD_MODEL_LOCATION = "../saved_models/resnet34v4/restnet34v5_best_model.pt"
+LOAD_MODEL_LOCATION = "../saved_models/resnet34v4/restnet34v6_best_model.pt"
 
 
 # the size of tensor arrays being displayed
