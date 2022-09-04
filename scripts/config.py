@@ -7,9 +7,9 @@ WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
 VARRY_LR = True
 SCHEDULED = True
-MSE_REDUCTION = "mean"
+MSE_REDUCTION = "None"
 PATIENCE = 16
-BATCH_SIZE = 1024
+BATCH_SIZE = 2048
 VAL_BATCHSIZE = 512
 PRINT_TRAIN = False
 PRINT_VAL = False
@@ -33,6 +33,7 @@ SAVE_IMG_DIR = '../dataset_run/bleve_orderd_e0'
 SAVE_OUTPUT_DIR = '../dataset_run/bleve_orderd_e0/outputs/outputs.txt'
 
 # Dataset split
+SHUFFLE_TRAIN = False
 TRAIN_RATIO = 0.80
 VAL_RATIO = 0.10
 TEST_RATIO = 0.10
@@ -41,19 +42,19 @@ ORDER = True
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet34v6"
-SAVED_MODEL_NAME = "resnet34v6"
+SAVED_MODEL_DIR = "../saved_models/resnet34v8"
+SAVED_MODEL_NAME = "resnet34v8"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet34v6"
+LOG_DIR = "../running_logs/resnet34v8"
 
 
 # load model from
-LOAD_MODEL_LOCATION = "../saved_models/resnet34v4/restnet34v6_best_model.pt"
+LOAD_MODEL_LOCATION = "../saved_models/resnet34v8/resnet34v8_best_model.pt"
 
 
 # the size of tensor arrays being displayed

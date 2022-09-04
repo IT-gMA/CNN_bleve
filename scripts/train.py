@@ -188,9 +188,9 @@ def main() -> object:
     train_dataloader, validation_dataloader, test_loader = dataset_import()
     model = create_model().to(DEVICE)
     #model.load_state_dict(torch.load("../saved_models/resnet34v5/restnet34v5_best_model.pt"))
-    #best_model = copy.deepcopy(model)
+    best_model = copy.deepcopy(model)
 
-    best_model = create_model().to(DEVICE)
+    #best_model = create_model().to(DEVICE)
     #clone_model(model, best_model)
 
     print(model)
@@ -218,8 +218,8 @@ def main() -> object:
             returned_mape = validation(validation_dataloader, model, loss_func, best_mape)
 
             if best_mape > returned_mape:
-                #best_model = copy.deepcopy(model)
-                best_model = clone_model(model, best_model)
+                best_model = copy.deepcopy(model)
+                #best_model = clone_model(model, best_model)
                 best_mape = returned_mape
 
             write_info = "------------------------------------END OF VALIDATION----------------------------------------\n"
