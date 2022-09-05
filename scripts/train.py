@@ -221,8 +221,8 @@ def main() -> object:
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         curr_lr = get_learning_rate(optimiser)
         wandb.log({'Learning rate': curr_lr})
-        if SCHEDULED:
-            lr_scheduler.step(train_loss)
+        '''if SCHEDULED:
+            lr_scheduler.step(train_loss)'''
 
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info)
