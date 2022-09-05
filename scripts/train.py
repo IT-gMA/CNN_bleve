@@ -1,6 +1,7 @@
 import copy
 
 import torch
+import torchfunc
 from torch import nn
 from dataset import dataset_import
 from utils import save_model, save_running_logs, load_model
@@ -102,18 +103,25 @@ def wandb_running_log(loss, accuracy, mape, rmse, state="Train"):
 def test(test_dataloader, model, loss_func):
     print("Final testing")
     # Start model testing
-    if DEVICE == "cuda":
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
         with torch.no_grad():
             run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
+
+        torch.cuda.empty_cache()
     else:
         run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
 
 
 def validation(val_dataloader, model, loss_func, best_mape):
     # Start model evaluation
-    if DEVICE == "cuda":
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        print("eval with cuda")
         with torch.no_grad():
             val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+
+        torch.cuda.empty_cache()
     else:
         val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
 
@@ -173,7 +181,7 @@ def perform_inference():
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
     model.eval()
     x, y = dataloader.dataset[0][0], dataloader.dataset[0][1]
-    if DEVICE == "cuda":
+    if DEVICE == 'cuda':
         with torch.no_grad():
             pred = get_predictions(x, model)
             mape = mean_absolute_percentage_error(y, pred)
@@ -221,7 +229,7 @@ def main() -> object:
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         curr_lr = get_learning_rate(optimiser)
         wandb.log({'Train/lr': curr_lr})
-        wandb.watch(model)
+        #wandb.watch(model)
         '''if SCHEDULED:
             lr_scheduler.step(train_loss)'''
 
