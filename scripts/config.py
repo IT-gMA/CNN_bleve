@@ -58,6 +58,9 @@ LOG_DIR = "../running_logs/resnet34v8"
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet34v8/resnet34v8_best_model.pt"
 
+# wandb running config
+WANDB_PROJECT_NAME = "CNN_bleve_v9"
+
 
 # the size of tensor arrays being displayed
 NP_FULL_SIZE = False

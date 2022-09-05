@@ -9,6 +9,10 @@ import sys
 import numpy as np
 from config import *
 from model import create_model
+import wandb
+
+
+wandb.init(project=WANDB_PROJECT_NAME)
 
 if NP_FULL_SIZE:
     np.set_printoptions(threshold=sys.maxsize)
@@ -80,9 +84,19 @@ def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, bes
         i += 1
 
     write_info = f"{mode} Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse_sum / i:>0.4f}    avg_mape: {mape_sum / i:>0.4f}  avg_accuracy: {acc_sum / i:>4f}%"
+    wandb_running_log(loss=loss_sum/i, mape=mape_sum/i, rmse=rmse_sum/i, accuracy=acc_sum/i, state=mode)
     save_running_logs(write_info)
     if mode == "Validation":
-        return mape_sum / i
+        return mape_sum / i, loss_sum
+
+
+def get_learning_rate(optimiser):
+    for param_group in optimiser.param_groups:
+        return param_group['lr']
+
+
+def wandb_running_log(loss, accuracy, mape, rmse, state="Train"):
+    wandb.log({f'{state} loss': loss, f'{state} rmse': rmse, f'{state} mape': mape, f'{state} accuracy': accuracy})
 
 
 def test(test_dataloader, model, loss_func):
@@ -99,12 +113,12 @@ def validation(val_dataloader, model, loss_func, best_mape):
     # Start model evaluation
     if DEVICE == "cuda":
         with torch.no_grad():
-            val_mape = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+            val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
     else:
-        val_mape = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+        val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
 
     best_mape = get_best_val_model(curr_mape=val_mape, best_mape=best_mape, model=model)
-    return best_mape
+    return best_mape, val_loss
 
 
 def train(train_dataloader, model, loss_func, optimiser):
@@ -138,6 +152,7 @@ def train(train_dataloader, model, loss_func, optimiser):
                 print("pred: {}\ntru: {}".format(pred, y))
 
             write_info = f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
+            wandb_running_log(loss=loss_value, mape=mape, rmse=rmse, accuracy=(1.0 - mape)*100.0, state="Train")
             save_running_logs(write_info)
 
     return total_loss
@@ -204,6 +219,8 @@ def main() -> object:
         save_running_logs(write_info)
 
         train_loss = train(train_dataloader, model, loss_func, optimiser)
+        curr_lr = get_learning_rate(optimiser)
+        wandb.log({'Learning rate': curr_lr})
         if SCHEDULED:
             lr_scheduler.step(train_loss)
 
@@ -215,8 +232,7 @@ def main() -> object:
                 i + 1)
             save_running_logs(write_info)
 
-            returned_mape = validation(validation_dataloader, model, loss_func, best_mape)
-
+            returned_mape, val_loss = validation(validation_dataloader, model, loss_func, best_mape)
             if best_mape > returned_mape:
                 best_model = copy.deepcopy(model)
                 #best_model = clone_model(model, best_model)
@@ -224,6 +240,9 @@ def main() -> object:
 
             write_info = "------------------------------------END OF VALIDATION----------------------------------------\n"
             save_running_logs(write_info)
+
+            if SCHEDULED:
+                lr_scheduler.step(val_loss)
 
     print("Training complete")
     save_model(model)
