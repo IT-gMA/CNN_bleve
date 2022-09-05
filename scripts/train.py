@@ -96,7 +96,7 @@ def get_learning_rate(optimiser):
 
 
 def wandb_running_log(loss, accuracy, mape, rmse, state="Train"):
-    wandb.log({f'{state} loss': loss, f'{state} rmse': rmse, f'{state} mape': mape, f'{state} accuracy': accuracy})
+    wandb.log({f'{state}/loss': loss, f'{state}/rmse': rmse, f'{state}/mape': mape, f'{state}/accuracy': accuracy})
 
 
 def test(test_dataloader, model, loss_func):
@@ -220,7 +220,8 @@ def main() -> object:
 
         train_loss = train(train_dataloader, model, loss_func, optimiser)
         curr_lr = get_learning_rate(optimiser)
-        wandb.log({'Learning rate': curr_lr})
+        wandb.log({'Train/lr': curr_lr})
+        wandb.watch(model)
         '''if SCHEDULED:
             lr_scheduler.step(train_loss)'''
 
