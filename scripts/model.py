@@ -2,7 +2,7 @@ import torch
 import torchvision.models as models
 import pretrainedmodels
 from torch import nn
-from config import DROPOUT, DEVICE, MODEL_NAME
+from config import DROPOUT, DEVICE, MODEL_NAME, NUM_ROW, NUM_COLUMN
 
 
 def create_model(new_model=True):

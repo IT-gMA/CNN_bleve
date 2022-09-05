@@ -22,7 +22,7 @@ NUM_COLUMN = 30
 NUM_EPOCHS = 20000    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
-MODEL_NAME = "resnet34"
+MODEL_NAME = "resnet50"
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mps')
 print('Running on {}'.format(DEVICE))
 
@@ -34,7 +34,7 @@ SAVE_OUTPUT_DIR = '../dataset_run/bleve_orderd_e0/outputs/outputs.txt'
 
 # Dataset split
 SHUFFLE_TRAIN = True
-SHUFFLE_VAL = True
+SHUFFLE_VAL = False
 TRAIN_RATIO = 0.80
 VAL_RATIO = 0.10
 TEST_RATIO = 0.10
@@ -44,22 +44,22 @@ ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet34v9"
-SAVED_MODEL_NAME = "resnet34v9"
+SAVED_MODEL_DIR = "../saved_models/resnet50"
+SAVED_MODEL_NAME = "resnet50"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet34v9"
+LOG_DIR = "../running_logs/resnet50"
 
 
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet34v9/resnet34v9_best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet34v9"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet50"
 
 
 # the size of tensor arrays being displayed
