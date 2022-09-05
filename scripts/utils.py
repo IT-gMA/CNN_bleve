@@ -12,7 +12,7 @@ from model import create_model
 np.set_printoptions(threshold=sys.maxsize)
 
 
-def order_liquid_dist_features(dataset, order_method=1):
+def order_liquid_dist_features(dataset):
     '''
     The purpose of this function is to order the dataset with respect to distance to sensor in ascending order,
     therefore, each liquid type (Butane or Propane) will follow each other one by one i.e butane the propane the butane ...
@@ -22,7 +22,7 @@ def order_liquid_dist_features(dataset, order_method=1):
     butanes = dataset[0:22954]      # the first half of the dataset contains on butane
     propanes = dataset[22954:len(dataset)]      # the second half of the dataset contains on propane
 
-    if order_method == 0:
+    if ORDER_METHOD == 0:
         for a in range(0, 46, 1):
             # traverse the row by distance, i.e vist all liquids with distnace = 5 then all liquids with distance = 6 ... 50
             for i in range(a, len(propanes), 46):
@@ -138,7 +138,7 @@ def create_raw_dataset(tensor=0):
 
     # OPTIONAL to order the dataset
     if ORDER:
-        dataset = order_liquid_dist_features(dataset, order_method=1)
+        dataset = order_liquid_dist_features(dataset)
 
     if tensor == 0:
         random.shuffle(dataset)
@@ -191,6 +191,11 @@ def write_run_configs(n_train, n_val, n_test):
     run_config4 = "     Number of train images: {}\n".format(n_train)
     run_config5 = "     Number of validation images: {}\n".format(n_val)
     run_config6 = "     Number of test images: {}\n".format(n_test)
+    if ORDER:
+        if ORDER_METHOD == 0:
+            run_config6 = f"{run_config6}\nOrder method: liquid >> distance\n"
+        else:
+            run_config6 = f"{run_config6}\nOrder method: distance >> liquid\n"
     run_config7 = "\n"
     if RESCALE:
         run_config7 = "Rescale factor:\n    Width: {} pixels\n      Height: {} pixels\n".format(NUM_ROW, NUM_COLUMN)

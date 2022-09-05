@@ -40,6 +40,7 @@ VAL_RATIO = 0.10
 TEST_RATIO = 0.10
 
 ORDER = True
+ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
