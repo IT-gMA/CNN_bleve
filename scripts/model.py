@@ -6,12 +6,16 @@ from config import DROPOUT, DEVICE, MODEL_NAME, NUM_ROW, NUM_COLUMN
 
 
 def create_model(new_model=True):
-    if MODEL_NAME == "resnet50" or MODEL_NAME == "resnet18" or MODEL_NAME == "resnet34":
+    if MODEL_NAME == "resnet50" or MODEL_NAME == "resnet18" or MODEL_NAME == "resnet34" or MODEL_NAME == "resnet101" or MODEL_NAME == "resnet152":
         # Resnet50
         if MODEL_NAME == "resnet50":
             model = models.resnet50(pretrained=new_model)
         elif MODEL_NAME == "resnet34":
             model = models.resnet34(pretrained=new_model)
+        elif MODEL_NAME == "resnet101":
+            model = models.resnet101(pretrained=new_model)
+        elif MODEL_NAME == "resnet152":
+            model = models.resnet152(pretrained=new_model)
         else:
             model = models.resnet18(pretrained=new_model)
 

@@ -117,7 +117,6 @@ def validation(val_dataloader, model, loss_func, best_mape):
     # Start model evaluation
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
-        print("eval with cuda")
         with torch.no_grad():
             val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
 
