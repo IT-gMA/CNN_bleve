@@ -1,5 +1,5 @@
 import torch
-from config import TRAIN_RATIO, VAL_RATIO, TEST_RATIO, BATCH_SIZE, NUM_WORKERS, VAL_BATCHSIZE, SHUFFLE_TRAIN
+from config import TRAIN_RATIO, VAL_RATIO, TEST_RATIO, BATCH_SIZE, NUM_WORKERS, VAL_BATCHSIZE, SHUFFLE_TRAIN, SHUFFLE_VAL
 import utils
 from torch.utils.data import Dataset, DataLoader
 
@@ -34,7 +34,7 @@ def dataset_import(inference=False):
     validation_loader = DataLoader(
         dataset=valid_dataset,
         batch_size=VAL_BATCHSIZE,
-        shuffle=False,
+        shuffle=SHUFFLE_VAL,
         num_workers=NUM_WORKERS
     )
 

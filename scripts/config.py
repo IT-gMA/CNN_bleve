@@ -7,7 +7,7 @@ WEIGHT_DECAY = 1e-06
 DROPOUT = 0.1994664332549059
 VARRY_LR = True
 SCHEDULED = True
-MSE_REDUCTION = "None"
+MSE_REDUCTION = "sum"
 PATIENCE = 16
 BATCH_SIZE = 2048
 VAL_BATCHSIZE = 512
@@ -33,7 +33,8 @@ SAVE_IMG_DIR = '../dataset_run/bleve_orderd_e0'
 SAVE_OUTPUT_DIR = '../dataset_run/bleve_orderd_e0/outputs/outputs.txt'
 
 # Dataset split
-SHUFFLE_TRAIN = False
+SHUFFLE_TRAIN = True
+SHUFFLE_VAL = True
 TRAIN_RATIO = 0.80
 VAL_RATIO = 0.10
 TEST_RATIO = 0.10

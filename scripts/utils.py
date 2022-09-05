@@ -177,7 +177,7 @@ def write_run_configs(n_train, n_val, n_test):
     run_config4 = "     Number of train images: {}\n".format(n_train)
     run_config5 = "     Number of validation images: {}\n".format(n_val)
     run_config6 = "     Number of test images: {}\n".format(n_test)
-    run_config7 = ""
+    run_config7 = "\n"
     if RESCALE:
         run_config7 = "Rescale factor:\n    Width: {} pixels\n      Height: {} pixels\n".format(NUM_ROW, NUM_COLUMN)
 
