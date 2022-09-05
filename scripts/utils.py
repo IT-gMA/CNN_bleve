@@ -12,7 +12,7 @@ from model import create_model
 np.set_printoptions(threshold=sys.maxsize)
 
 
-def order_liquid_dist_features(dataset):
+def order_liquid_dist_features(dataset, order_method=1):
     '''
     The purpose of this function is to order the dataset with respect to distance to sensor in ascending order,
     therefore, each liquid type (Butane or Propane) will follow each other one by one i.e butane the propane the butane ...
@@ -22,15 +22,29 @@ def order_liquid_dist_features(dataset):
     butanes = dataset[0:22954]      # the first half of the dataset contains on butane
     propanes = dataset[22954:len(dataset)]      # the second half of the dataset contains on propane
 
-    for a in range(0, 46, 1):       # traverse the row by distance, i.e vist all liquids with distnace = 5 then all liquids with distance = 6 ... 50
-        for i in range(a, len(propanes), 46):
-            if i < len(butanes):    # Since there are more propanes present, we'll arrange the first 499 butanes and 499 propanes first
-                # order: butane and then propane
-                ordered_dataset.append(butanes[i])
-                ordered_dataset.append(propanes[i])
+    if order_method == 0:
+        for a in range(0, 46, 1):
+            # traverse the row by distance, i.e vist all liquids with distnace = 5 then all liquids with distance = 6 ... 50
+            for i in range(a, len(propanes), 46):
+                if i < len(
+                        butanes):  # Since there are more propanes present, we'll arrange the first 499 butanes and 499 propanes first
+                    # order: butane and then propane
+                    ordered_dataset.append(butanes[i])
+                    ordered_dataset.append(propanes[i])
+                else:
+                    # the last (500th) propane
+                    ordered_dataset.append(propanes[i])
+    else:
+        # arrange a set of 5-50 for each liquid, followed by another set of 5-50 of a different liquid
+        for i in range(0, len(propanes), 46):
+            if i < len(butanes):
+                for j in range(i, i + 46):
+                    ordered_dataset.append(propanes[j])
+                for j in range(i, i + 46):
+                    ordered_dataset.append(butanes[j])
             else:
-                # the last (500th) propane
-                ordered_dataset.append(propanes[i])
+                for j in range(i, i + 46):
+                    ordered_dataset.append(propanes[j])
 
     print(len(ordered_dataset))
     return ordered_dataset
@@ -124,7 +138,7 @@ def create_raw_dataset(tensor=0):
 
     # OPTIONAL to order the dataset
     if ORDER:
-        dataset = order_liquid_dist_features(dataset)
+        dataset = order_liquid_dist_features(dataset, order_method=1)
 
     if tensor == 0:
         random.shuffle(dataset)
