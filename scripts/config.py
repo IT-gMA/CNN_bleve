@@ -24,6 +24,7 @@ FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet50"
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mps')
+EMPTY_CUDA_CACHE = True
 print('Running on {}'.format(DEVICE))
 
 # Dataset directory: images and output

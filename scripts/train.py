@@ -100,15 +100,20 @@ def wandb_running_log(loss, accuracy, mape, rmse, state="Train"):
     wandb.log({f'{state}/loss': loss, f'{state}/rmse': rmse, f'{state}/mape': mape, f'{state}/accuracy': accuracy})
 
 
+def empty_cuda_cache():
+    if EMPTY_CUDA_CACHE:
+        torch.cuda.empty_cache()
+
+
 def test(test_dataloader, model, loss_func):
     print("Final testing")
     # Start model testing
     if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+        empty_cuda_cache()
         with torch.no_grad():
             run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
 
-        torch.cuda.empty_cache()
+        empty_cuda_cache()
     else:
         run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
 
@@ -116,11 +121,11 @@ def test(test_dataloader, model, loss_func):
 def validation(val_dataloader, model, loss_func, best_mape):
     # Start model evaluation
     if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+        empty_cuda_cache()
         with torch.no_grad():
             val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
 
-        torch.cuda.empty_cache()
+        empty_cuda_cache()
     else:
         val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
 
