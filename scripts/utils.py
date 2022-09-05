@@ -201,7 +201,12 @@ def write_run_configs(n_train, n_val, n_test):
     if RESCALE:
         run_config7 = "Rescale factor:\n    Width: {} pixels\n      Height: {} pixels\n".format(NUM_ROW, NUM_COLUMN)
 
-    config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}\n"
+    if EMPTY_CUDA_CACHE:
+        run_config8 = "Empty cuda cache: True\n"
+    else:
+        run_config8 = "Empty cuda cache: False\n"
+
+    config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}\n"
     save_running_logs(config_write)
 
 
