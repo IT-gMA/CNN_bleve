@@ -50,7 +50,7 @@ def create_model(new_model=True):
         model.fc = nn.Sequential(nn.Linear(num_features, 256),
                                  nn.LeakyReLU(),
                                  nn.Linear(256, 32),
-                                 nn.LeakyReLU(),
+                                 nn.ELU(),
                                  nn.Linear(32, 1))
     else:
         Exception(f"{MODEL_NAME} is an invalid model's name")

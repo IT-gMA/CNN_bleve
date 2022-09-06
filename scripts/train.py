@@ -14,6 +14,8 @@ import wandb
 
 
 wandb.init(project=WANDB_PROJECT_NAME)
+if torch.cuda.is_available():
+    torch.cuda.empty_cache()
 
 if NP_FULL_SIZE:
     np.set_printoptions(threshold=sys.maxsize)
@@ -240,6 +242,9 @@ def main() -> object:
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info)
 
+        if i % 50 == 0  and i > 1:
+            save_model(model, save_from_val=False, final=False, epoch=f"epoch{i+1}")
+
         if i % 5 == 0 and i > 1:
             write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(
                 i + 1)
@@ -255,10 +260,10 @@ def main() -> object:
             save_running_logs(write_info)
 
             if SCHEDULED:
-                lr_scheduler.step(val_loss)
+                lr_scheduler.step(best_mape)
 
     print("Training complete")
-    save_model(model)
+    save_model(model, final=True)
     test(test_loader, model, loss_func)
 
     # Now run with best model
