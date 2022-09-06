@@ -4,22 +4,23 @@ import torch
 LEARNING_RATE = 1e-3
 MIN_LEARNING_RATE = 0.0005598419915061102
 WEIGHT_DECAY = 1e-06
+USE_DROP_OUT = True
 DROPOUT = 0.1994664332549059
 VARRY_LR = True
 SCHEDULED = True
 MSE_REDUCTION = "mean"
 PATIENCE = 16
-BATCH_SIZE = 128
-VAL_BATCHSIZE = 64
+BATCH_SIZE = 4096
+VAL_BATCHSIZE = 512
 PRINT_TRAIN = False
 PRINT_VAL = False
 PRINT_TEST = False
 
 # Image format
 RESCALE = True
-NUM_ROW = 300
-NUM_COLUMN = 300
-NUM_EPOCHS = 10000    # number of epochs to train for
+NUM_ROW = 30
+NUM_COLUMN = 30
+NUM_EPOCHS = 20000    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet18"
@@ -45,22 +46,22 @@ ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet18"
-SAVED_MODEL_NAME = "resnet18"
+SAVED_MODEL_DIR = "../saved_models/resnet18v2"
+SAVED_MODEL_NAME = "resnet18v2"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet18"
+LOG_DIR = "../running_logs/resnet18v2"
 
 
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet18/resnet18best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet18"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet18v2"
 
 
 # the size of tensor arrays being displayed
