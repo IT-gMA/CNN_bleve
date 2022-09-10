@@ -148,7 +148,6 @@ def train(train_dataloader, model, loss_func, optimiser):
         pred = get_predictions(X, model)
 
         loss_value = loss_func(pred, y)
-        loss_value = loss_value.type(torch.float32)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
