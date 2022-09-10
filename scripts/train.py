@@ -242,7 +242,7 @@ def main() -> object:
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info)
 
-        if i % 80 == 0  and i > 1:
+        if i % SAVED_EPOCH == 0  and i > 1:
             save_model(model, save_from_val=False, final=False, epoch=f"epoch{i+1}")
 
         if i % 5 == 0 and i > 1:
