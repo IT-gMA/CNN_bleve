@@ -27,13 +27,13 @@ def create_model(new_model=True):
                                      nn.Linear(num_features, 256),
                                      nn.LeakyReLU(),
                                      nn.Linear(256, 32),
-                                     nn.LeakyReLU(),
+                                     nn.ELU(),
                                      nn.Linear(32, 1))
         else:
             model.fc = nn.Sequential(nn.Linear(num_features, 256),
                                      nn.LeakyReLU(),
                                      nn.Linear(256, 32),
-                                     nn.LeakyReLU(),
+                                     nn.ELU(),
                                      nn.Linear(32, 1))
 
     elif MODEL_NAME == "efficientnet_b7":
@@ -45,7 +45,7 @@ def create_model(new_model=True):
                                  nn.Linear(num_features, 256),
                                  nn.LeakyReLU(),
                                  nn.Linear(256, 32),
-                                 nn.LeakyReLU(),
+                                 nn.ELU(),
                                  nn.Linear(32, 1))
 
     elif MODEL_NAME == "inceptionv3":

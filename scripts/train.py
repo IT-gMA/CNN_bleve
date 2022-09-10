@@ -148,6 +148,7 @@ def train(train_dataloader, model, loss_func, optimiser):
         pred = get_predictions(X, model)
 
         loss_value = loss_func(pred, y)
+        loss_value = loss_value.type(torch.float32)
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
@@ -225,7 +226,7 @@ def main() -> object:
     print(model)
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
-    best_mape = 100.0
+    best_mape = 1.01
 
     epochs = NUM_EPOCHS
     for i in range(epochs):
@@ -242,7 +243,7 @@ def main() -> object:
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info)
 
-        if i % 50 == 0  and i > 1:
+        if i % 80 == 0  and i > 1:
             save_model(model, save_from_val=False, final=False, epoch=f"epoch{i+1}")
 
         if i % 5 == 0 and i > 1:

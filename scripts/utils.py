@@ -100,6 +100,7 @@ def read_img(tensor=0):
             #bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
             if DEVICE == "mps":
                 bleve_img = np.float32(bleve_img)
+
             bleve_img = transform(bleve_img)
             #print(bleve_img.shape)
 
@@ -216,9 +217,9 @@ def write_run_configs(n_train, n_val, n_test):
 
 
 if __name__ == '__main__':
-    #dataset = create_raw_dataset()
+    '''dataset = create_raw_dataset(tensor=1)
 
-    '''saved_dir = '../data/tru_sized_imgs'
+    saved_dir = '../dataset_run/bleve_no_err'
     os.chdir(saved_dir)
     for i in range(0, 4):
         print(dataset[i][0].dtype)
