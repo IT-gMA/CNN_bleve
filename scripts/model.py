@@ -21,7 +21,7 @@ def create_model(new_model=True):
 
         num_features = model.fc.in_features
 
-        #model.fc = nn.Linear(num_features, 1)
+        # model.fc = nn.Linear(num_features, 1)
         if USE_DROP_OUT:
             model.fc = nn.Sequential(nn.Dropout(DROPOUT),
                                      nn.Linear(num_features, 256),
@@ -40,20 +40,25 @@ def create_model(new_model=True):
         # Efficientnet_b7
         model = models.efficientnet_b7(pretrained=new_model)
         num_features = model.classifier[1].in_features
-        #model.classifier[1] = nn.Linear(model.classifier[1].in_features, 1)
-        model.classifier = nn.Sequential(nn.Dropout(0.5),
-                                 nn.Linear(num_features, 256),
-                                 nn.LeakyReLU(),
-                                 nn.Linear(256, 32),
-                                 nn.ELU(),
-                                 nn.Linear(32, 1))
+        if USE_DROP_OUT:
+            model.classifier = nn.Sequential(nn.Dropout(DROPOUT),
+                                             nn.Linear(num_features, 256),
+                                             nn.LeakyReLU(),
+                                             nn.Linear(256, 32),
+                                             nn.ELU(),
+                                             nn.Linear(32, 1))
+        else:
+            model.classifier = nn.Sequential(nn.Linear(num_features, 256),
+                                             nn.LeakyReLU(),
+                                             nn.Linear(256, 32),
+                                             nn.ELU(),
+                                             nn.Linear(32, 1))
 
     elif MODEL_NAME == "inceptionv3":
         # Inceptionv3
         model = models.inception_v3(pretrained=new_model)
 
         num_features = model.fc.in_features
-        #model.fc = nn.Linear(num_features, 1)
         model.AuxLogits.fc = nn.Linear(model.AuxLogits.fc.in_features, 1)
         model.fc = nn.Sequential(nn.Linear(num_features, 256),
                                  nn.LeakyReLU(),
