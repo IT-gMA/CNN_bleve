@@ -181,29 +181,6 @@ def get_predictions(input_data, model):
     return predictions
 
 
-def perform_inference():
-    model = load_model(LOAD_MODEL_LOCATION)
-    dataloader = dataset_import(inference=True)
-    loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
-    model.eval()
-    x, y = dataloader.dataset[0][0], dataloader.dataset[0][1]
-    if DEVICE == 'cuda':
-        with torch.no_grad():
-            pred = get_predictions(x, model)
-            mape = mean_absolute_percentage_error(y, pred)
-
-            rmse = RMSELoss(y, pred)
-            acc = (1.0 - mape) * 100.0
-            print(f"Inference results: rmse: {rmse:>0.4f}    mape: {mape:>0.4f}    accuracy: {acc:>4f}%")
-    else:
-        pred = get_predictions(x, model)
-        mape = mean_absolute_percentage_error(y, pred)
-
-        rmse = RMSELoss(y, pred)
-        acc = (1.0 - mape) * 100.0
-        print(f"Inference results: rmse: {rmse:>0.4f}    mape: {mape:>0.4f}    accuracy: {acc:>4f}%")
-
-
 def clone_model(og, clone):
     mp = list(og.parameters())
     mcp = list(clone.parameters())
