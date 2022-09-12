@@ -39,5 +39,5 @@ def perform_inference(model, inf_on_test_set=False):
 
 
 if __name__ == '__main__':
-    model = load_model(LOAD_MODEL_LOCATION)
+    model = load_model(LOAD_MODEL_LOCATION, resume=False)
     perform_inference(model=model, inf_on_test_set=True)

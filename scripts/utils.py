@@ -160,7 +160,10 @@ def check_data_vs_output_quantity(img_list, output_list):
 def save_model(model, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
     if final:
         save_location = "{}/{}_final_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
-        torch.save(model.state_dict(), save_location)
+        torch.save({
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimiser.state_dict(),
+        }, save_location)
     else:
         if save_from_val:
             save_location = "{}/{}_best_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
@@ -179,11 +182,15 @@ def save_model(model, save_from_val=False, final=False, epoch=0, loss=0, optimis
     return save_location
 
 
-def load_model(saved_location):
+def load_model(saved_location, resume=True):
     ckpt = torch.load(saved_location, map_location=DEVICE)
-    model = create_model(False)
+    model = create_model(ckpt['model_state_dict'])
     model.load_state_dict(ckpt)
-    return model
+
+    if resume:
+        return model.to(DEVICE), ckpt
+    else:
+        return model.to(DEVICE)
 
 
 def save_running_logs(info):

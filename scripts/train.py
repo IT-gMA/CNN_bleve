@@ -189,22 +189,32 @@ def clone_model(og, clone):
     return clone
 
 
+def restore_params(ckpt, model, optimiser):
+    optimiser = optimiser.load_state_dict(ckpt['optimizer_state_dict'])
+    epoch = ckpt['epoch']
+    loss = ckpt['loss']
+    return optimiser, epoch, loss
+
+
 def main() -> object:
     train_dataloader, validation_dataloader, test_loader = dataset_import()
     model = create_model().to(DEVICE)
-    #model.load_state_dict(torch.load("../saved_models/resnet34v5/restnet34v5_best_model.pt"))
-    best_model = copy.deepcopy(model)
-
-    #best_model = create_model().to(DEVICE)
-    #clone_model(model, best_model)
+    RESUME = False
 
     print(model)
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
+    start_epoch = 0
+    if RESUME:
+        model, ckpt = load_model(SAVED_MODEL_DIR)
+        optimiser, start_epoch, loss = restore_params(ckpt, model, optimiser)
+
+    loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
+    best_model = copy.deepcopy(model)
     best_mape = 1.01
 
     epochs = NUM_EPOCHS
-    for i in range(epochs):
+    for i in range(start_epoch, epochs):
         write_info = "___Epoch {}______________________________________________________________________".format(i + 1)
         save_running_logs(write_info)
 
@@ -228,7 +238,7 @@ def main() -> object:
 
             returned_mape, val_loss = validation(validation_dataloader, model, loss_func, best_mape)
             if best_mape > returned_mape:      # found a better mape
-                save_model(model, save_from_val=True, final=False, epoch=i, loss=val_loss, optimiser=optimiser)
+                save_model(model, save_from_val=True, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
                 best_model = copy.deepcopy(model)
                 #best_model = clone_model(model, best_model)
                 best_mape = returned_mape
@@ -240,7 +250,7 @@ def main() -> object:
                 lr_scheduler.step(best_mape)
 
     print("Training complete")
-    save_model(model, final=True)
+    save_model(model, final=True, optimiser=optimiser)
     test(test_loader, model, loss_func)
 
     # Now run with best model
