@@ -1,5 +1,6 @@
 import torch
 import torchvision.models as models
+import torchvision
 import pretrainedmodels
 from torch import nn
 from config import DROPOUT, DEVICE, MODEL_NAME, NUM_ROW, NUM_COLUMN, USE_DROP_OUT

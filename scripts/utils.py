@@ -157,15 +157,24 @@ def check_data_vs_output_quantity(img_list, output_list):
         Exception(f"Missing {num_img - num_output} output vales in file {OUTPUT_FILE}")
 
 
-def save_model(model, save_from_val=False, final=False, epoch=""):
-    if not save_from_val and final:
+def save_model(model, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
+    if final:
         save_location = "{}/{}_final_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
-    elif save_from_val and not final:
-        save_location = "{}/{}_best_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+        torch.save(model.state_dict(), save_location)
     else:
-        save_location = "{}/{}_{}_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, epoch, SAVED_MODEL_FORMAT)
+        if save_from_val:
+            save_location = "{}/{}_best_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+        else:
+            save_location = "{}/{}_{}_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
+
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimiser.state_dict(),
+            'loss': loss,
+        }, save_location)
         print(f"Save model at {save_location}")
-    torch.save(model.state_dict(), save_location)
+
     print("Pytorch model's state is saved to " + save_location)
     return save_location
 

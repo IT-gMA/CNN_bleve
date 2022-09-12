@@ -44,7 +44,6 @@ def get_best_val_model(curr_mape, best_mape, model):
     if curr_mape < best_mape:
         write_info = "Best validation mape is {}, improved from {}".format(curr_mape, best_mape)
         save_running_logs(write_info)
-        save_model(model, save_from_val=True)
         return curr_mape
     else:
         return best_mape
@@ -220,7 +219,7 @@ def main() -> object:
         save_running_logs(write_info)
 
         if i % SAVED_EPOCH == 0  and i > 1:
-            save_model(model, save_from_val=False, final=False, epoch=f"epoch{i+1}")
+            save_model(model, save_from_val=False, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
 
         if i % 5 == 0 and i > 1:
             write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(
@@ -228,7 +227,8 @@ def main() -> object:
             save_running_logs(write_info)
 
             returned_mape, val_loss = validation(validation_dataloader, model, loss_func, best_mape)
-            if best_mape > returned_mape:
+            if best_mape > returned_mape:      # found a better mape
+                save_model(model, save_from_val=True, final=False, epoch=i, loss=val_loss, optimiser=optimiser)
                 best_model = copy.deepcopy(model)
                 #best_model = clone_model(model, best_model)
                 best_mape = returned_mape
