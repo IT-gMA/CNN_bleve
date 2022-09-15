@@ -110,11 +110,11 @@ def test(test_dataloader, model, loss_func, seed):
     if torch.cuda.is_available():
         empty_cuda_cache()
         with torch.no_grad():
-            run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST, seed)
+            run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST, seed=seed)
 
         empty_cuda_cache()
     else:
-        run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST, seed)
+        run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST, seed=seed)
 
 
 def validation(val_dataloader, model, loss_func, best_mape, seed):
@@ -122,11 +122,11 @@ def validation(val_dataloader, model, loss_func, best_mape, seed):
     if torch.cuda.is_available():
         empty_cuda_cache()
         with torch.no_grad():
-            val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape, seed)
+            val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape, seed=seed)
 
         empty_cuda_cache()
     else:
-        val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape, seed)
+        val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape, seed=seed)
 
     best_mape = get_best_val_model(curr_mape=val_mape, best_mape=best_mape, model=model, seed=seed)
     return best_mape, val_loss
@@ -195,7 +195,7 @@ def restore_params(ckpt, model, optimiser):
 
 
 def main(seed):
-    train_dataloader, validation_dataloader, test_loader = dataset_import(seed)
+    train_dataloader, validation_dataloader, test_loader = dataset_import(seed=seed)
     model = create_model().to(DEVICE)
     RESUME = False
 
@@ -257,7 +257,6 @@ def main(seed):
     loss_func, optimiser, lr_scheduler = model_param_tweaking(best_model)
     save_running_logs("Running with best val model:", seed)
     test(test_loader, best_model, loss_func, seed)
-    save_running_logs("----------------------------------------------------------------------------\n\n\n", seed)
 
 
 if __name__ == '__main__':
@@ -266,4 +265,5 @@ if __name__ == '__main__':
         wandb_run_name = f"{WANDB_PROJECT_NAME}_seed_{seed}"
         wandb.init(project=wandb_run_name)
         main(seed)
+        wandb.finish()
     #perform_inference()
