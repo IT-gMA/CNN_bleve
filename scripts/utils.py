@@ -7,23 +7,21 @@ import glob, sys
 from natsort import natsorted, ns
 import torch, torchvision
 from config import *
-import config
 from model import create_model
 from functools import reduce
 
 np.set_printoptions(threshold=sys.maxsize)
-SEED = config.CURR_SEED
 
 
-def order_liquid_dist_features(dataset):
+def order_liquid_dist_features(dataset, seed):
     '''
     The purpose of this function is to order the dataset with respect to distance to sensor in ascending order,
     therefore, each liquid type (Butane or Propane) will follow each other one by one i.e butane the propane the butane ...
     to ensure training, validation and testing sets have roughly equal liquid type representation
     '''
     ordered_dataset = []    # new ordered dataset
-    butanes = sub_div_shuffle_dataset(dataset[0:22954], SEED)      # the first half of the dataset contains on butane
-    propanes = sub_div_shuffle_dataset(dataset[22954:len(dataset)], SEED * 2 + 7)      # the second half of the dataset contains on propane
+    butanes = sub_div_shuffle_dataset(dataset[0:22954], seed)      # the first half of the dataset contains on butane
+    propanes = sub_div_shuffle_dataset(dataset[22954:len(dataset)], seed*2+7)      # the second half of the dataset contains on propane
 
     if ORDER_METHOD == 0:
         for a in range(0, 46, 1):
@@ -64,6 +62,7 @@ def sub_div_shuffle_dataset(data, seed):
     random.seed(seed)
     random.shuffle(new_data)
     new_data = reduce(lambda x, y: x + y, new_data)     # reduce the dataset back to a 1d list
+    print("Random shuffled with seed {}".format(seed))
     return new_data
 
 
@@ -89,7 +88,7 @@ def read_output_txt(tensor=0):
     return output_list
 
 
-def read_img(tensor=0):
+def read_img(tensor=0, seed=0):
     dataset_img = []
     image_names = []
 
@@ -104,7 +103,7 @@ def read_img(tensor=0):
     for img in img_paths:
         img_name = get_gas_name(img)
         image_names.append(img_name)
-        if SEED == 0:
+        if seed == 0:
             print(f"reading {img_name}")
 
         bleve_img = cv2.imread(img)
@@ -134,7 +133,7 @@ def get_gas_name(file_name):
     return file_name
 
 
-def create_raw_dataset(tensor=0):
+def create_raw_dataset(tensor=0, seed=0):
     if tensor == 0:
         print("Create permanent shuffled dataset at {}.".format(SAVE_IMG_DIR))
     elif tensor == 1:
@@ -146,7 +145,7 @@ def create_raw_dataset(tensor=0):
 
     dataset = []
     output_list = read_output_txt(tensor)
-    img_list, image_names = read_img(tensor)
+    img_list, image_names = read_img(tensor, seed)
     check_data_vs_output_quantity(img_list, output_list)
 
     for i in range(0, len(output_list)):
@@ -158,7 +157,7 @@ def create_raw_dataset(tensor=0):
 
     # OPTIONAL to order the dataset
     if ORDER:
-        dataset = order_liquid_dist_features(dataset)
+        dataset = order_liquid_dist_features(dataset, seed)
 
     if tensor == 0:
         random.shuffle(dataset)
@@ -175,18 +174,18 @@ def check_data_vs_output_quantity(img_list, output_list):
         Exception(f"Missing {num_img - num_output} output vales in file {OUTPUT_FILE}")
 
 
-def save_model(model, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
+def save_model(model, seed, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
     if final:
-        save_location = "{}/seed_{}/{}_final_model{}".format(SAVED_MODEL_DIR, SEED, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+        save_location = "{}/seed_{}/{}_final_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
         torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimiser.state_dict(),
         }, save_location)
     else:
         if save_from_val:
-            save_location = "{}/seed_{}/{}_best_model{}".format(SAVED_MODEL_DIR, SEED, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+            save_location = "{}/seed_{}/{}_best_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
         else:
-            save_location = "{}/seed_{}/{}_{}_model{}".format(SAVED_MODEL_DIR, SEED, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
+            save_location = "{}/seed_{}/{}_{}_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
 
         torch.save({
             'epoch': epoch,
@@ -211,17 +210,17 @@ def load_model(saved_location, resume=True):
         return model.to(DEVICE)
 
 
-def save_running_logs(info):
+def save_running_logs(info, seed):
     print(info)
 
     log_file_name = SAVED_MODEL_NAME.replace(".pt", "")
-    save_location = "{}/seed_{}/{}.txt".format(LOG_DIR, SEED, log_file_name)
+    save_location = "{}/seed_{}/{}.txt".format(LOG_DIR, seed, log_file_name)
     with open(save_location, 'a') as f:
         f.write(f"{info}\n")
 
 
-def write_run_configs(n_train, n_val, n_test):
-    run_config0 = "Time: {}\nSeed: {}\nDataset directory: {}\nModel: {}\nLearning rate: {}\n".format(datetime.datetime.now(), SEED, SAVE_IMG_DIR, MODEL_NAME, LEARNING_RATE)
+def write_run_configs(n_train, n_val, n_test, seed):
+    run_config0 = "Time: {}\nSeed: {}\nDataset directory: {}\nModel: {}\nLearning rate: {}\n".format(datetime.datetime.now(), seed, SAVE_IMG_DIR, MODEL_NAME, LEARNING_RATE)
     if SCHEDULED:
         run_config0 = f"{run_config0}\nMin learning rate: {MIN_LEARNING_RATE}\n"
     run_config1 = "Weight decay: {}\nPatience: {}\n Number of running epochs: {}\n".format(WEIGHT_DECAY, PATIENCE, NUM_EPOCHS)
@@ -247,7 +246,7 @@ def write_run_configs(n_train, n_val, n_test):
         run_config8 = "Empty cuda cache: False\n"
 
     config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}\n"
-    save_running_logs(config_write)
+    save_running_logs(config_write, seed)
 
 
 def run_dir_exist(dir):

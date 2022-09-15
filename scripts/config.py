@@ -2,7 +2,6 @@ import torch
 
 # Random shuffle of dataset
 SEED_RANGE = 2
-CURR_SEED = 0
 
 # Configure the training process
 LEARNING_RATE = 1e-3

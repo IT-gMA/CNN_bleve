@@ -4,11 +4,11 @@ import utils
 from torch.utils.data import Dataset, DataLoader
 
 
-def retrieve_dataset():
+def retrieve_dataset(seed):
     """Dataset retrived is in the form (Torch tensor):
         [0]: image
         [1]: corresponding output value"""
-    dataset = utils.create_raw_dataset(tensor=1)
+    dataset = utils.create_raw_dataset(tensor=1, seed=seed)
 
     num_train = int(len(dataset) * TRAIN_RATIO)
     num_val = int(len(dataset) * VAL_RATIO)
@@ -21,8 +21,8 @@ def retrieve_dataset():
     return train_set, val_set, test_set, num_train, num_val, num_test
 
 
-def dataset_import(inference=False):
-    train_dataset, valid_dataset, test_dataset, num_train, num_val, num_test = retrieve_dataset()
+def dataset_import(inference=False, seed=0):
+    train_dataset, valid_dataset, test_dataset, num_train, num_val, num_test = retrieve_dataset(seed)
 
     train_loader = DataLoader(
         dataset=train_dataset,
@@ -46,7 +46,7 @@ def dataset_import(inference=False):
     )
 
     if not inference:
-        utils.write_run_configs(num_train, num_val, num_test)
+        utils.write_run_configs(num_train, num_val, num_test, seed=seed)
         return train_loader, validation_loader, test_loader
     else:
         return test_loader
