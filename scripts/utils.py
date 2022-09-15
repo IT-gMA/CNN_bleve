@@ -175,16 +175,16 @@ def check_data_vs_output_quantity(img_list, output_list):
 
 def save_model(model, seed, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
     if final:
-        save_location = "{}_seed_{}/{}_final_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+        save_location = "{}/seed_{}/{}_final_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
         torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimiser.state_dict(),
         }, save_location)
     else:
         if save_from_val:
-            save_location = "{}_seed_{}/{}_best_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+            save_location = "{}/seed_{}/{}_best_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
         else:
-            save_location = "{}_seed_{}/{}_{}_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
+            save_location = "{}/seed_{}/{}_{}_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
 
         torch.save({
             'epoch': epoch,
@@ -213,7 +213,7 @@ def save_running_logs(info, seed):
     print(info)
 
     log_file_name = SAVED_MODEL_NAME.replace(".pt", "")
-    save_location = "{}_seed_{}/{}.txt".format(LOG_DIR, seed, log_file_name)
+    save_location = "{}/seed_{}/{}.txt".format(LOG_DIR, seed, log_file_name)
     with open(save_location, 'a') as f:
         f.write(f"{info}\n")
 
@@ -246,6 +246,17 @@ def write_run_configs(n_train, n_val, n_test, seed):
 
     config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}\n"
     save_running_logs(config_write, seed)
+
+
+def create_run_dirs():
+    parent_dir1 = f"{SAVED_MODEL_DIR}/"
+    parent_dir2 = f"{LOG_DIR}/"
+    mode = 0o666
+    for seed in range(0, SEED_RANGE + 1):
+        path1 = os.path.join(parent_dir1, f"seed_{seed}")
+        path2 = os.path.join(parent_dir2, f"seed_{seed}")
+        os.mkdir(path1, mode)
+        os.mkdir(path2, mode)
 
 
 if __name__ == '__main__':

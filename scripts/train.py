@@ -4,7 +4,7 @@ import torch
 import torchfunc
 from torch import nn
 from dataset import dataset_import
-from utils import save_model, save_running_logs, load_model
+from utils import save_model, save_running_logs, load_model, create_run_dirs
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
@@ -261,6 +261,7 @@ def main(seed):
 
 
 if __name__ == '__main__':
+    create_run_dirs()
     for seed in range (0, SEED_RANGE + 1):
         wandb_run_name = f"{WANDB_PROJECT_NAME}_seed_{seed}"
         wandb.init(project=wandb_run_name)
