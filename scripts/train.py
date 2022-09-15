@@ -12,8 +12,6 @@ from config import *
 from model import create_model
 import wandb
 
-
-wandb.init(project=WANDB_PROJECT_NAME)
 if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
@@ -196,12 +194,14 @@ def restore_params(ckpt, model, optimiser):
     return optimiser, epoch, loss
 
 
-def main() -> object:
+def main(seed):
     train_dataloader, validation_dataloader, test_loader = dataset_import()
     model = create_model().to(DEVICE)
     RESUME = False
 
-    print(model)
+    if seed == 0:
+        print(model)
+
     loss_func, optimiser, lr_scheduler = model_param_tweaking(model)
 
     start_epoch = 0
@@ -229,7 +229,7 @@ def main() -> object:
         save_running_logs(write_info)
 
         if i % SAVED_EPOCH == 0  and i > 1:
-            save_model(model, save_from_val=False, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
+            save_model(model, seed=seed, save_from_val=False, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
 
         if i % 5 == 0 and i > 1:
             write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(
@@ -238,7 +238,7 @@ def main() -> object:
 
             returned_mape, val_loss = validation(validation_dataloader, model, loss_func, best_mape)
             if best_mape > returned_mape:      # found a better mape
-                save_model(model, save_from_val=True, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
+                save_model(model, seed=seed, save_from_val=True, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
                 best_model = copy.deepcopy(model)
                 #best_model = clone_model(model, best_model)
                 best_mape = returned_mape
@@ -250,15 +250,19 @@ def main() -> object:
                 lr_scheduler.step(best_mape)
 
     print("Training complete")
-    save_model(model, final=True, optimiser=optimiser)
+    save_model(model, seed=seed, final=True, optimiser=optimiser)
     test(test_loader, model, loss_func)
 
     # Now run with best model
     loss_func, optimiser, lr_scheduler = model_param_tweaking(best_model)
     save_running_logs("Running with best val model:")
     test(test_loader, best_model, loss_func)
+    save_running_logs("----------------------------------------------------------------------------\n\n\n")
 
 
 if __name__ == '__main__':
-    main()
+    for seed in range (0, SEED_RANGE + 1):
+        wandb_run_name = f"{WANDB_PROJECT_NAME}_seed_{seed}"
+        wandb.init(project=wandb_run_name)
+        main(seed)
     #perform_inference()

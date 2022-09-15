@@ -1,5 +1,8 @@
 import torch
 
+# Random shuffle of dataset
+SEED_RANGE = 5
+
 # Configure the training process
 LEARNING_RATE = 1e-3
 MIN_LEARNING_RATE = 0.00015
@@ -11,19 +14,19 @@ SCHEDULED = True
 MSE_REDUCTION = "mean"
 PATIENCE = 16
 BATCH_SIZE = 256
-VAL_BATCHSIZE = 256
+VAL_BATCHSIZE = 128
 PRINT_TRAIN = False
 PRINT_VAL = False
 PRINT_TEST = False
 
 # Image format
 RESCALE = True
-NUM_ROW = 24
-NUM_COLUMN = 24
-NUM_EPOCHS = 5000    # number of epochs to train for
+NUM_ROW = 120
+NUM_COLUMN = 120
+NUM_EPOCHS = 5500    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
-MODEL_NAME = "resnet50"
+MODEL_NAME = "resnet34"
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('mps')
 EMPTY_CUDA_CACHE = False
 print('Running on {}'.format(DEVICE))
@@ -37,31 +40,31 @@ SAVE_OUTPUT_DIR = '../dataset_run/bleve_no_errv4/outputs/outputs.txt'
 # Dataset split
 SHUFFLE_TRAIN = True
 SHUFFLE_VAL = False
-TRAIN_RATIO = 0.80
-VAL_RATIO = 0.10
-TEST_RATIO = 0.10
+TRAIN_RATIO = 0.76
+VAL_RATIO = 0.12
+TEST_RATIO = 0.12
 
 ORDER = True
 ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet50v2"
-SAVED_MODEL_NAME = "resnet50v2"
+SAVED_MODEL_DIR = "../saved_models/resnet34"
+SAVED_MODEL_NAME = "resnet34"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet50v2"
+LOG_DIR = "../running_logs/resnet34"
 
 
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet18v2/resnet18v2best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet50v2"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet34"
 
 
 # the size of tensor arrays being displayed

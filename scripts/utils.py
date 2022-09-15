@@ -8,19 +8,20 @@ from natsort import natsorted, ns
 import torch, torchvision
 from config import *
 from model import create_model
+from functools import reduce
 
 np.set_printoptions(threshold=sys.maxsize)
 
 
-def order_liquid_dist_features(dataset):
+def order_liquid_dist_features(dataset, seed):
     '''
     The purpose of this function is to order the dataset with respect to distance to sensor in ascending order,
     therefore, each liquid type (Butane or Propane) will follow each other one by one i.e butane the propane the butane ...
     to ensure training, validation and testing sets have roughly equal liquid type representation
     '''
     ordered_dataset = []    # new ordered dataset
-    butanes = dataset[0:22954]      # the first half of the dataset contains on butane
-    propanes = dataset[22954:len(dataset)]      # the second half of the dataset contains on propane
+    butanes = sub_div_shuffle_dataset(dataset[0:22954], seed)      # the first half of the dataset contains on butane
+    propanes = sub_div_shuffle_dataset(dataset[22954:len(dataset)], seed*2+7)      # the second half of the dataset contains on propane
 
     if ORDER_METHOD == 0:
         for a in range(0, 46, 1):
@@ -48,6 +49,20 @@ def order_liquid_dist_features(dataset):
 
     print(len(ordered_dataset))
     return ordered_dataset
+
+
+def sub_div_shuffle_dataset(data, seed=0):
+    # subdivide full sized data into separate gas datas, each gas data contains 46 rows corresponding to distance 5-50m
+    new_data = []
+    for i in range(0, len(data), 46):
+        gas_data = data[i:i+46]
+        #print(gas_data)
+        new_data.append(gas_data)
+
+    random.seed(seed)
+    random.shuffle(new_data)
+    new_data = reduce(lambda x, y: x + y, new_data)     # reduce the dataset back to a 1d list
+    return new_data
 
 
 def read_output_txt(tensor=0):
@@ -116,7 +131,7 @@ def get_gas_name(file_name):
     return file_name
 
 
-def create_raw_dataset(tensor=0):
+def create_raw_dataset(tensor=0, seed=0):
     if tensor == 0:
         print("Create permanent shuffled dataset at {}.".format(SAVE_IMG_DIR))
     elif tensor == 1:
@@ -140,7 +155,7 @@ def create_raw_dataset(tensor=0):
 
     # OPTIONAL to order the dataset
     if ORDER:
-        dataset = order_liquid_dist_features(dataset)
+        dataset = order_liquid_dist_features(dataset, seed)
 
     if tensor == 0:
         random.shuffle(dataset)
@@ -157,18 +172,18 @@ def check_data_vs_output_quantity(img_list, output_list):
         Exception(f"Missing {num_img - num_output} output vales in file {OUTPUT_FILE}")
 
 
-def save_model(model, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
+def save_model(model, seed, save_from_val=False, final=False, epoch=0, loss=0, optimiser=None):
     if final:
-        save_location = "{}/{}_final_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+        save_location = "{}_seed_{}/{}_final_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
         torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimiser.state_dict(),
         }, save_location)
     else:
         if save_from_val:
-            save_location = "{}/{}_best_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
+            save_location = "{}_seed_{}/{}_best_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, SAVED_MODEL_FORMAT)
         else:
-            save_location = "{}/{}_{}_model{}".format(SAVED_MODEL_DIR, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
+            save_location = "{}_seed_{}/{}_{}_model{}".format(SAVED_MODEL_DIR, seed, SAVED_MODEL_NAME, epoch + 1, SAVED_MODEL_FORMAT)
 
         torch.save({
             'epoch': epoch,
@@ -183,8 +198,8 @@ def save_model(model, save_from_val=False, final=False, epoch=0, loss=0, optimis
 
 
 def load_model(saved_location, resume=True):
-    ckpt = torch.load(saved_location, map_location=DEVICE)
-    model = create_model(ckpt['model_state_dict'])
+    ckpt = torch.load(saved_location, map_location=torch.device('cpu'))
+    model = create_model(ckpt)
     model.load_state_dict(ckpt)
 
     if resume:
@@ -202,8 +217,8 @@ def save_running_logs(info):
         f.write(f"{info}\n")
 
 
-def write_run_configs(n_train, n_val, n_test):
-    run_config0 = "Time: {}\nDataset directory: {}\nModel: {}\nLearning rate: {}\n".format(datetime.datetime.now(), SAVE_IMG_DIR, MODEL_NAME, LEARNING_RATE)
+def write_run_configs(n_train, n_val, n_test, seed):
+    run_config0 = "Time: {}\nSeed: {}\nDataset directory: {}\nModel: {}\nLearning rate: {}\n".format(datetime.datetime.now(), seed, SAVE_IMG_DIR, MODEL_NAME, LEARNING_RATE)
     if SCHEDULED:
         run_config0 = f"{run_config0}\nMin learning rate: {MIN_LEARNING_RATE}\n"
     run_config1 = "Weight decay: {}\nPatience: {}\n Number of running epochs: {}\n".format(WEIGHT_DECAY, PATIENCE, NUM_EPOCHS)
