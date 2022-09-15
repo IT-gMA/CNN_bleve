@@ -3,10 +3,10 @@ import torchvision.models as models
 import torchvision
 import pretrainedmodels
 from torch import nn
-from config import DROPOUT, DEVICE, MODEL_NAME, NUM_ROW, NUM_COLUMN, USE_DROP_OUT
+from config import DROPOUT, DEVICE, MODEL_NAME, NUM_ROW, NUM_COLUMN, USE_DROP_OUT, USE_PRETRAIN
 
 
-def create_model(new_model=True):
+def create_model(new_model=USE_PRETRAIN):
     if MODEL_NAME == "resnet50" or MODEL_NAME == "resnet18" or MODEL_NAME == "resnet34" or MODEL_NAME == "resnet101" or MODEL_NAME == "resnet152":
         # Resnet50
         if MODEL_NAME == "resnet50":
