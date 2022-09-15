@@ -213,7 +213,7 @@ def save_running_logs(info, seed):
     print(info)
 
     log_file_name = SAVED_MODEL_NAME.replace(".pt", "")
-    save_location = "{}_{}/{}.txt".format(LOG_DIR, seed, log_file_name)
+    save_location = "{}_seed_{}/{}.txt".format(LOG_DIR, seed, log_file_name)
     with open(save_location, 'a') as f:
         f.write(f"{info}\n")
 
