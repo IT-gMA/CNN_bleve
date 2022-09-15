@@ -209,11 +209,11 @@ def load_model(saved_location, resume=True):
         return model.to(DEVICE)
 
 
-def save_running_logs(info):
+def save_running_logs(info, seed):
     print(info)
 
     log_file_name = SAVED_MODEL_NAME.replace(".pt", "")
-    save_location = "{}/{}.txt".format(LOG_DIR, log_file_name)
+    save_location = "{}_{}/{}.txt".format(LOG_DIR, seed, log_file_name)
     with open(save_location, 'a') as f:
         f.write(f"{info}\n")
 
@@ -245,7 +245,7 @@ def write_run_configs(n_train, n_val, n_test, seed):
         run_config8 = "Empty cuda cache: False\n"
 
     config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}\n"
-    save_running_logs(config_write)
+    save_running_logs(config_write, seed)
 
 
 if __name__ == '__main__':
