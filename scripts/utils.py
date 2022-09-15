@@ -87,7 +87,7 @@ def read_output_txt(tensor=0):
     return output_list
 
 
-def read_img(tensor=0):
+def read_img(tensor=0, seed=0):
     dataset_img = []
     image_names = []
 
@@ -102,7 +102,8 @@ def read_img(tensor=0):
     for img in img_paths:
         img_name = get_gas_name(img)
         image_names.append(img_name)
-        print(f"reading {img_name}")
+        if seed == 0:
+            print(f"reading {img_name}")
 
         bleve_img = cv2.imread(img)
         # Resize each image to its intended size after converted from tabular data form
@@ -143,7 +144,7 @@ def create_raw_dataset(tensor=0, seed=0):
 
     dataset = []
     output_list = read_output_txt(tensor)
-    img_list, image_names = read_img(tensor)
+    img_list, image_names = read_img(tensor, seed)
     check_data_vs_output_quantity(img_list, output_list)
 
     for i in range(0, len(output_list)):
