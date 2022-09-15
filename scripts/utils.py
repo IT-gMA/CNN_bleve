@@ -248,6 +248,11 @@ def write_run_configs(n_train, n_val, n_test, seed):
     save_running_logs(config_write, seed)
 
 
+def run_dir_exist(dir):
+    isExist = os.path.exists(dir)
+    return isExist
+
+
 def create_run_dirs():
     parent_dir1 = f"{SAVED_MODEL_DIR}/"
     parent_dir2 = f"{LOG_DIR}/"
@@ -255,8 +260,10 @@ def create_run_dirs():
     for seed in range(0, SEED_RANGE + 1):
         path1 = os.path.join(parent_dir1, f"seed_{seed}")
         path2 = os.path.join(parent_dir2, f"seed_{seed}")
-        os.mkdir(path1, mode)
-        os.mkdir(path2, mode)
+        if not run_dir_exist(path1):
+            os.mkdir(path1, mode)
+        if not run_dir_exist(path2)
+            os.mkdir(path2, mode)
 
 
 if __name__ == '__main__':
