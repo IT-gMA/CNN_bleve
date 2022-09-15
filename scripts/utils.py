@@ -262,7 +262,7 @@ def create_run_dirs():
         path2 = os.path.join(parent_dir2, f"seed_{seed}")
         if not run_dir_exist(path1):
             os.mkdir(path1, mode)
-        if not run_dir_exist(path2)
+        if not run_dir_exist(path2):
             os.mkdir(path2, mode)
 
 
