@@ -1,7 +1,7 @@
 import torch
 
 # Random shuffle of dataset
-SEED_RANGE = 2
+SEED_RANGE = 5
 
 # Configure the training process
 LEARNING_RATE = 1e-3
@@ -13,17 +13,18 @@ VARRY_LR = False
 SCHEDULED = True
 MSE_REDUCTION = "mean"
 PATIENCE = 16
-BATCH_SIZE = 256
-VAL_BATCHSIZE = 128
+BATCH_SIZE = 512
+VAL_BATCHSIZE = 256
 PRINT_TRAIN = False
 PRINT_VAL = False
 PRINT_TEST = False
+USE_PRETRAIN = False
 
 # Image format
 RESCALE = True
 NUM_ROW = 24
 NUM_COLUMN = 24
-NUM_EPOCHS = 5    # number of epochs to train for
+NUM_EPOCHS = 2500    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet18"
@@ -49,26 +50,26 @@ ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet18v7"
-SAVED_MODEL_NAME = "resnet18v7"
+SAVED_MODEL_DIR = "../saved_models/resnet18v6"
+SAVED_MODEL_NAME = "resnet18v6"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet18v7"
+LOG_DIR = "../running_logs/resnet18v6"
 
 
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet18v2/resnet18v2best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet18v7"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet18v6"
 
 
 # the size of tensor arrays being displayed
 NP_FULL_SIZE = False
 
 # nth epoch at which a checkpoint is saved
-SAVED_EPOCH = 2
+SAVED_EPOCH = 100
