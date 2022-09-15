@@ -38,16 +38,16 @@ def model_param_tweaking(model):
     return loss_func, optimiser, scheduler
 
 
-def get_best_val_model(curr_mape, best_mape, model):
+def get_best_val_model(curr_mape, best_mape, model, seed):
     if curr_mape < best_mape:
         write_info = "Best validation mape is {}, improved from {}".format(curr_mape, best_mape)
-        save_running_logs(write_info)
+        save_running_logs(write_info, seed)
         return curr_mape
     else:
         return best_mape
 
 
-def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, best_mape=100.0):
+def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, best_mape=1.01, seed=0):
     size = len(dataloader)
     i = 0
     mape_sum = 0
@@ -75,7 +75,7 @@ def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, bes
             print("pred: {}\ntru: {}".format(pred, y))
 
         write_info = f"{mode}:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}    accuracy: {acc:>4f}%"
-        save_running_logs(write_info)
+        save_running_logs(write_info, seed)
 
         loss_sum += loss_value
         mape_sum += mape
@@ -85,7 +85,7 @@ def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, bes
 
     write_info = f"{mode} Summary:  avg_loss: {loss_sum / i:>7f}   avg_rmse: {rmse_sum / i:>0.4f}    avg_mape: {mape_sum / i:>0.4f}  avg_accuracy: {acc_sum / i:>4f}%"
     wandb_running_log(loss=loss_sum/i, mape=mape_sum/i, rmse=rmse_sum/i, accuracy=acc_sum/i, state=mode)
-    save_running_logs(write_info)
+    save_running_logs(write_info, seed)
     if mode == "Validation":
         return mape_sum / i, loss_sum
 
@@ -104,35 +104,35 @@ def empty_cuda_cache():
         torch.cuda.empty_cache()
 
 
-def test(test_dataloader, model, loss_func):
+def test(test_dataloader, model, loss_func, seed):
     print("Final testing")
     # Start model testing
     if torch.cuda.is_available():
         empty_cuda_cache()
         with torch.no_grad():
-            run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
+            run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST, seed)
 
         empty_cuda_cache()
     else:
-        run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST)
+        run_model(model, loss_func, test_dataloader, "Test", PRINT_TEST, seed)
 
 
-def validation(val_dataloader, model, loss_func, best_mape):
+def validation(val_dataloader, model, loss_func, best_mape, seed):
     # Start model evaluation
     if torch.cuda.is_available():
         empty_cuda_cache()
         with torch.no_grad():
-            val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+            val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape, seed)
 
         empty_cuda_cache()
     else:
-        val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape)
+        val_mape, val_loss = run_model(model, loss_func, val_dataloader, "Validation", PRINT_VAL, best_mape, seed)
 
-    best_mape = get_best_val_model(curr_mape=val_mape, best_mape=best_mape, model=model)
+    best_mape = get_best_val_model(curr_mape=val_mape, best_mape=best_mape, model=model, seed=seed)
     return best_mape, val_loss
 
 
-def train(train_dataloader, model, loss_func, optimiser):
+def train(train_dataloader, model, loss_func, optimiser, seed):
     size = len(train_dataloader.dataset)
     total_loss = 0
 
@@ -164,7 +164,7 @@ def train(train_dataloader, model, loss_func, optimiser):
 
             write_info = f"Train:  loss: {loss_value:>7f}   [{current:>5d}/{size:>5d}]     rmse: {rmse:>0.4f}    mape: {mape:>0.4f}"
             wandb_running_log(loss=loss_value, mape=mape, rmse=rmse, accuracy=(1.0 - mape)*100.0, state="Train")
-            save_running_logs(write_info)
+            save_running_logs(write_info, seed)
 
     return total_loss
 
@@ -216,9 +216,9 @@ def main(seed):
     epochs = NUM_EPOCHS
     for i in range(start_epoch, epochs):
         write_info = "___Epoch {}______________________________________________________________________".format(i + 1)
-        save_running_logs(write_info)
+        save_running_logs(write_info, seed)
 
-        train_loss = train(train_dataloader, model, loss_func, optimiser)
+        train_loss = train(train_dataloader, model, loss_func, optimiser, seed)
         curr_lr = get_learning_rate(optimiser)
         wandb.log({'Train/lr': curr_lr})
         #wandb.watch(model)
@@ -226,7 +226,7 @@ def main(seed):
             lr_scheduler.step(train_loss)'''
 
         write_info = "________________________________________________________________________________\n"
-        save_running_logs(write_info)
+        save_running_logs(write_info, seed)
 
         if i % SAVED_EPOCH == 0  and i > 1:
             save_model(model, seed=seed, save_from_val=False, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
@@ -234,9 +234,9 @@ def main(seed):
         if i % 5 == 0 and i > 1:
             write_info = "---------------------------------VALIDATION AT EPOCH {}-----------------------------------".format(
                 i + 1)
-            save_running_logs(write_info)
+            save_running_logs(write_info, seed)
 
-            returned_mape, val_loss = validation(validation_dataloader, model, loss_func, best_mape)
+            returned_mape, val_loss = validation(validation_dataloader, model, loss_func, best_mape, seed)
             if best_mape > returned_mape:      # found a better mape
                 save_model(model, seed=seed, save_from_val=True, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
                 best_model = copy.deepcopy(model)
@@ -244,20 +244,20 @@ def main(seed):
                 best_mape = returned_mape
 
             write_info = "------------------------------------END OF VALIDATION----------------------------------------\n"
-            save_running_logs(write_info)
+            save_running_logs(write_info, seed)
 
             if SCHEDULED:
                 lr_scheduler.step(best_mape)
 
     print("Training complete")
     save_model(model, seed=seed, final=True, optimiser=optimiser)
-    test(test_loader, model, loss_func)
+    test(test_loader, model, loss_func, seed)
 
     # Now run with best model
     loss_func, optimiser, lr_scheduler = model_param_tweaking(best_model)
-    save_running_logs("Running with best val model:")
+    save_running_logs("Running with best val model:", seed)
     test(test_loader, best_model, loss_func)
-    save_running_logs("----------------------------------------------------------------------------\n\n\n")
+    save_running_logs("----------------------------------------------------------------------------\n\n\n", seed)
 
 
 if __name__ == '__main__':
