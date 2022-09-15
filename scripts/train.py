@@ -256,7 +256,7 @@ def main(seed):
     # Now run with best model
     loss_func, optimiser, lr_scheduler = model_param_tweaking(best_model)
     save_running_logs("Running with best val model:", seed)
-    test(test_loader, best_model, loss_func)
+    test(test_loader, best_model, loss_func, seed)
     save_running_logs("----------------------------------------------------------------------------\n\n\n", seed)
 
 
