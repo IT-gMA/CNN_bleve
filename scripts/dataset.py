@@ -21,7 +21,7 @@ def retrieve_dataset(seed):
     return train_set, val_set, test_set, num_train, num_val, num_test
 
 
-def dataset_import(inference=False, seed=0):
+def dataset_import(inference=False, seed=0, model=None):
     train_dataset, valid_dataset, test_dataset, num_train, num_val, num_test = retrieve_dataset(seed)
 
     train_loader = DataLoader(

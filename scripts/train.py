@@ -195,8 +195,8 @@ def restore_params(ckpt, model, optimiser):
 
 
 def main(seed):
-    train_dataloader, validation_dataloader, test_loader = dataset_import(seed=seed)
     model = create_model().to(DEVICE)
+    train_dataloader, validation_dataloader, test_loader = dataset_import(seed=seed, model=model)
     RESUME = False
 
     if seed == 0:

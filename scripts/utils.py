@@ -219,7 +219,7 @@ def save_running_logs(info, seed):
         f.write(f"{info}\n")
 
 
-def write_run_configs(n_train, n_val, n_test, seed):
+def write_run_configs(n_train, n_val, n_test, seed, model=None):
     run_config0 = "Time: {}\nSeed: {}\nDataset directory: {}\nModel: {}\nPretrained: {}\nLearning rate: {}\n".format(datetime.datetime.now(), seed, SAVE_IMG_DIR, MODEL_NAME, USE_PRETRAIN, LEARNING_RATE)
     if SCHEDULED:
         run_config0 = f"{run_config0}\nMin learning rate: {MIN_LEARNING_RATE}\n"
@@ -245,7 +245,9 @@ def write_run_configs(n_train, n_val, n_test, seed):
     else:
         run_config8 = "Empty cuda cache: False\n"
 
-    config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}\n"
+    run_config9 = "Model's fully connected layer: {}\n".format(model.fc)
+
+    config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}{run_config9}\n"
     save_running_logs(config_write, seed)
 
 
