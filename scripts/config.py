@@ -22,9 +22,9 @@ USE_PRETRAIN = False
 
 # Image format
 RESCALE = True
-NUM_ROW = 24
-NUM_COLUMN = 24
-NUM_EPOCHS = 2500    # number of epochs to train for
+NUM_ROW = 168
+NUM_COLUMN = 168
+NUM_EPOCHS = 1800    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet18"
@@ -50,22 +50,22 @@ ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet18v6"
-SAVED_MODEL_NAME = "resnet18v6"
+SAVED_MODEL_DIR = "../saved_models/resnet18v8"
+SAVED_MODEL_NAME = "resnet18v8"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet18v6"
+LOG_DIR = "../running_logs/resnet18v8"
 
 
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet18v2/resnet18v2best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet18v6"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet18v9"
 
 
 # the size of tensor arrays being displayed

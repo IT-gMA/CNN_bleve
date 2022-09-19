@@ -228,7 +228,7 @@ def main(seed):
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info, seed)
 
-        if i % SAVED_EPOCH == 0  and i > 1:
+        if i % SAVED_EPOCH == 0 and i > 799:
             save_model(model, seed=seed, save_from_val=False, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
 
         if i % 5 == 0 and i > 1:
@@ -261,9 +261,13 @@ def main(seed):
 
 if __name__ == '__main__':
     create_run_dirs()
-    for seed in range (0, SEED_RANGE + 1):
+    for seed in range (0, SEED_RANGE):
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         wandb_run_name = f"{WANDB_PROJECT_NAME}_seed_{seed}"
         wandb.init(project=wandb_run_name)
         main(seed)
         wandb.finish()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
     #perform_inference()

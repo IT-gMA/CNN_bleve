@@ -49,11 +49,13 @@ def create_model(new_model=USE_PRETRAIN):
                                              nn.Sigmoid(),
                                              nn.Linear(32, 1))
         else:
-            model.classifier = nn.Sequential(nn.Linear(num_features, 256),
+            model.classifier = nn.Sequential(nn.Linear(num_features, 512),
                                              nn.LeakyReLU(),
-                                             nn.Linear(256, 32),
+                                             nn.Linear(512, 256),
+                                             nn.LeakyReLU(),
+                                             nn.Linear(256, 64),
                                              nn.Sigmoid(),
-                                             nn.Linear(32, 1))
+                                             nn.Linear(64, 1))
 
     elif MODEL_NAME == "inceptionv3":
         # Inceptionv3

@@ -258,7 +258,7 @@ def create_run_dirs():
     parent_dir1 = f"{SAVED_MODEL_DIR}/"
     parent_dir2 = f"{LOG_DIR}/"
     mode = 0o666
-    for seed in range(0, SEED_RANGE + 1):
+    for seed in range(0, SEED_RANGE):
         path1 = os.path.join(parent_dir1, f"seed_{seed}")
         path2 = os.path.join(parent_dir2, f"seed_{seed}")
         if not run_dir_exist(path1):
