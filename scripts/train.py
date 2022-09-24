@@ -228,7 +228,7 @@ def main(seed):
         write_info = "________________________________________________________________________________\n"
         save_running_logs(write_info, seed)
 
-        if i % SAVED_EPOCH == 0 and i > 799:
+        if i % SAVED_EPOCH == 0 and i > SAVED_AFTER:
             save_model(model, seed=seed, save_from_val=False, final=False, epoch=i, loss=train_loss, optimiser=optimiser)
 
         if i % 5 == 0 and i > 1:

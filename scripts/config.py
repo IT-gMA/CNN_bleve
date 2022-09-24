@@ -24,7 +24,7 @@ USE_PRETRAIN = False
 RESCALE = True
 NUM_ROW = 168
 NUM_COLUMN = 168
-NUM_EPOCHS = 1800    # number of epochs to train for
+NUM_EPOCHS = 1600    # number of epochs to train for
 FILE_EXTENSION = ".png"
 
 MODEL_NAME = "resnet18"
@@ -65,7 +65,7 @@ LOG_DIR = "../running_logs/resnet18v8"
 LOAD_MODEL_LOCATION = "../saved_models/resnet18v2/resnet18v2best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet18v9"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet18v8"
 
 
 # the size of tensor arrays being displayed
@@ -73,3 +73,4 @@ NP_FULL_SIZE = False
 
 # nth epoch at which a checkpoint is saved
 SAVED_EPOCH = 100
+SAVED_AFTER = 799

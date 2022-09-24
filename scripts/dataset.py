@@ -46,7 +46,7 @@ def dataset_import(inference=False, seed=0, model=None):
     )
 
     if not inference:
-        utils.write_run_configs(num_train, num_val, num_test, seed=seed)
+        utils.write_run_configs(num_train, num_val, num_test, seed=seed, model=model)
         return train_loader, validation_loader, test_loader
     else:
         return test_loader
