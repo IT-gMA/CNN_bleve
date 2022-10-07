@@ -62,6 +62,7 @@ def run_model(model, loss_func, dataloader, mode, print_tensor_output=False, bes
         pred = get_predictions(X, model)
 
         loss_value = loss_func(pred, y)
+
         if DEVICE == "mps":
             # mps framework supports float32 instead of 64 unlike cuda
             loss_value = loss_value.type(torch.float32)
