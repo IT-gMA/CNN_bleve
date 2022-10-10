@@ -105,7 +105,7 @@ def read_img(tensor=0, seed=0):
 
     with IncrementalBar(f'Processing...', max=num_img) as bar:
         for img in img_paths:
-            sleep(PROGRESS_SLEEP_TIME)
+            #sleep(PROGRESS_SLEEP_TIME)
             img_name = get_gas_name(img)
             image_names.append(img_name)
 

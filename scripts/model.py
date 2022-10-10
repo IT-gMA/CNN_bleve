@@ -33,9 +33,9 @@ def create_model(new_model=USE_PRETRAIN):
         else:
             model.fc = nn.Sequential(nn.Linear(num_features, 512),
                                      nn.LeakyReLU(),
-                                     nn.Linear(512, 16),
+                                     nn.Linear(512, 64),
                                      nn.Sigmoid(),
-                                     nn.Linear(16, 1))
+                                     nn.Linear(64, 1))
 
     elif MODEL_NAME == "efficientnet_b7":
         # Efficientnet_b7

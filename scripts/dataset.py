@@ -4,7 +4,7 @@ import utils
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms import Compose
-from progress.bar import FillingSquaresBar as prog_bar
+from progress.bar import IncrementalBar
 from time import sleep
 
 
@@ -34,20 +34,26 @@ def retrieve_dataset(seed):
 def transform_train_set(train_set):
     aug_train_set = []
     transform_list = get_transformations()
-    with prog_bar('Applying augmentation...', max=len(train_set)):
-        sleep(PROGRESS_SLEEP_TIME)
+
+    i = 1
+    with IncrementalBar('Applying augmentation...', max=len(train_set)) as bar:
+        #sleep(PROGRESS_SLEEP_TIME)
         for data in train_set:
             img = data[0]
             output = data[1]
             aug_train_set.append([img, output])
-            for transformations in transform_list:
-                aug_img = transformations(img)
-                aug_train_set.append([aug_img, output])
+            with IncrementalBar(f'Image {i}...', max=len(transform_list)) as inner_bar:
+                for transformations in transform_list:
+                    aug_img = transformations(img)
+                    aug_train_set.append([aug_img, output])
+                    inner_bar.update()
 
-            # Add image noise
-            aug_img = add_noise(img, noise_factor=0.25)
-            aug_train_set.append([aug_img, output])
-        prog_bar.next()
+                inner_bar.finish()
+                # Add image noise
+                aug_img = add_noise(img, noise_factor=0.25)
+                aug_train_set.append([aug_img, output])
+            i += 1
+            bar.update()
 
     return aug_train_set
 
@@ -64,7 +70,7 @@ def get_transformations():
     t2 = Compose([transforms.ColorJitter(brightness=0.2, contrast=0.15, saturation=0.05, hue=0.125),
                   transforms.RandomInvert(p=0.35)])
     t3 = Compose([transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
-                  transforms.ElasticTransform(alpha=100.0)])
+                  transforms.RandomAutocontrast()])
 
     img_transform = [t1, t2, t3]
     return img_transform
