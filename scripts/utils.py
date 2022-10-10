@@ -9,6 +9,8 @@ import torch, torchvision
 from config import *
 from model import create_model
 from functools import reduce
+from time import sleep
+from progress.bar import IncrementalBar
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -99,29 +101,31 @@ def read_img(tensor=0, seed=0):
 
     img_paths = glob.glob("{}/*{}".format(img_dir, FILE_EXTENSION))
     img_paths = natsorted(img_paths, key=lambda y: y.lower())   # Sort the images in alphanumerical order
+    num_img = len([entry for entry in os.listdir(SAVE_IMG_DIR) if os.path.isfile(os.path.join(SAVE_IMG_DIR, entry))])
 
-    for img in img_paths:
-        img_name = get_gas_name(img)
-        image_names.append(img_name)
-        if seed == 0:
-            print(f"reading {img_name}")
+    with IncrementalBar(f'Processing...', max=num_img) as bar:
+        for img in img_paths:
+            sleep(PROGRESS_SLEEP_TIME)
+            img_name = get_gas_name(img)
+            image_names.append(img_name)
 
-        bleve_img = cv2.imread(img)
-        # Resize each image to its intended size after converted from tabular data form
-        #bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+            bleve_img = cv2.imread(img)
+            # Resize each image to its intended size after converted from tabular data form
+            # bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
-        if tensor == 1:
-            if RESCALE:
-                bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+            if tensor == 1:
+                if RESCALE:
+                    bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
-            #bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
-            if DEVICE == "mps":
-                bleve_img = np.float32(bleve_img)
+                # bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
+                if DEVICE == "mps":
+                    bleve_img = np.float32(bleve_img)
 
-            bleve_img = transform(bleve_img)
-            #print(bleve_img.shape)
+                bleve_img = transform(bleve_img)
+                # print(bleve_img.shape)
 
-        dataset_img.append(bleve_img)
+            dataset_img.append(bleve_img)
+            bar.next()
 
     return dataset_img, image_names
 
