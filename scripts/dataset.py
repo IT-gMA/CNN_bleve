@@ -1,9 +1,11 @@
 import torch
-from config import TRAIN_RATIO, VAL_RATIO, TRAIN_AUG, BATCH_SIZE, NUM_WORKERS, VAL_BATCHSIZE, SHUFFLE_TRAIN, SHUFFLE_VAL
+from config import TRAIN_RATIO, VAL_RATIO, TRAIN_AUG, BATCH_SIZE, NUM_WORKERS, VAL_BATCHSIZE, SHUFFLE_TRAIN, SHUFFLE_VAL, PROGRESS_SLEEP_TIME
 import utils
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms import Compose
+from progress.bar import FillingSquaresBar as prog_bar
+from time import sleep
 
 
 def retrieve_dataset(seed):
@@ -32,20 +34,21 @@ def retrieve_dataset(seed):
 def transform_train_set(train_set):
     aug_train_set = []
     transform_list = get_transformations()
-    i = 1
-    for data in train_set:
-        print(f"applying augmentation for image {i}")
-        img = data[0]
-        output = data[1]
-        aug_train_set.append([img, output])
-        for transformations in transform_list:
-            aug_img = transformations(img)
-            aug_train_set.append([aug_img, output])
+    with prog_bar('Applying augmentation...', max=len(train_set)):
+        sleep(PROGRESS_SLEEP_TIME)
+        for data in train_set:
+            img = data[0]
+            output = data[1]
+            aug_train_set.append([img, output])
+            for transformations in transform_list:
+                aug_img = transformations(img)
+                aug_train_set.append([aug_img, output])
 
-        # Add image noise
-        aug_img = add_noise(img, noise_factor=0.25)
-        aug_train_set.append([aug_img, output])
-        i += 1
+            # Add image noise
+            aug_img = add_noise(img, noise_factor=0.25)
+            aug_train_set.append([aug_img, output])
+        prog_bar.next()
+
     return aug_train_set
 
 
