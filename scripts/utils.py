@@ -219,8 +219,10 @@ def save_running_logs(info, seed):
         f.write(f"{info}\n")
 
 
-def write_run_configs(n_train, n_val, n_test, seed, model=None):
+def write_run_configs(n_train, n_val, n_test, seed, model=None, transformations=None):
     run_config0 = "Time: {}\nSeed: {}\nDataset directory: {}\nModel: {}\nPretrained: {}\nLearning rate: {}\n".format(datetime.datetime.now(), seed, SAVE_IMG_DIR, MODEL_NAME, USE_PRETRAIN, LEARNING_RATE)
+    if TRAIN_AUG:
+        run_config0 = f"{run_config0}\nTrain set transformations: {transformations}\n"
     if SCHEDULED:
         run_config0 = f"{run_config0}\nMin learning rate: {MIN_LEARNING_RATE}\n"
     run_config1 = "Weight decay: {}\nPatience: {}\n Number of running epochs: {}\n".format(WEIGHT_DECAY, PATIENCE, NUM_EPOCHS)
