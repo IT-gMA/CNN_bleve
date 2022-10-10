@@ -4,7 +4,7 @@ import utils
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms import Compose
-from progress.bar import IncrementalBar
+from progress.bar import FillingSquaresBar
 from time import sleep
 
 
@@ -35,25 +35,21 @@ def transform_train_set(train_set):
     aug_train_set = []
     transform_list = get_transformations()
 
-    i = 1
-    with IncrementalBar('Applying augmentation...', max=len(train_set)) as bar:
+    with FillingSquaresBar('Applying augmentation...', max=len(train_set)) as bar:
         #sleep(PROGRESS_SLEEP_TIME)
         for data in train_set:
             img = data[0]
             output = data[1]
             aug_train_set.append([img, output])
-            with IncrementalBar(f'Image {i}...', max=len(transform_list)) as inner_bar:
-                for transformations in transform_list:
-                    aug_img = transformations(img)
-                    aug_train_set.append([aug_img, output])
-                    inner_bar.update()
 
-                inner_bar.finish()
-                # Add image noise
-                aug_img = add_noise(img, noise_factor=0.25)
+            for transformations in transform_list:
+                aug_img = transformations(img)
                 aug_train_set.append([aug_img, output])
-            i += 1
-            bar.update()
+                # Add image noise
+
+            aug_img = add_noise(img, noise_factor=0.25)
+            aug_train_set.append([aug_img, output])
+            bar.next()
 
     return aug_train_set
 
