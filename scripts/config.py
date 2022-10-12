@@ -12,17 +12,17 @@ DROPOUT = 0.2477008537587833
 VARRY_LR = False
 SCHEDULED = True
 MSE_REDUCTION = "mean"
-PATIENCE = 18
-BATCH_SIZE = 256
-VAL_BATCHSIZE = 256
+PATIENCE = 16
+BATCH_SIZE = 192
+VAL_BATCHSIZE = 192
 PRINT_TRAIN = False
 PRINT_VAL = False
 PRINT_TEST = False
 
 # Image format
 RESCALE = True
-NUM_ROW = 224
-NUM_COLUMN = 224
+NUM_ROW = 240
+NUM_COLUMN = 240
 NUM_EPOCHS = 1650    # number of epochs to train for
 FILE_EXTENSION = ".png"
 TRAIN_AUG = True
@@ -37,37 +37,37 @@ print('Running on {}'.format(DEVICE))
 # Dataset directory: images and output
 OUTPUT_FILE = '../dataset/data/outputs/outputs.txt'
 IMG_DIR = '../dataset/data'
-SAVE_IMG_DIR = '../dataset_run/bleve_50x50'
-SAVE_OUTPUT_DIR = '../dataset_run/bleve_50x50/outputs/outputs.txt'
+SAVE_IMG_DIR = '../dataset_run/bleve_40x40'
+SAVE_OUTPUT_DIR = '../dataset_run/bleve_40x40/outputs/outputs.txt'
 
 # Dataset split
 SHUFFLE_TRAIN = True
 SHUFFLE_VAL = False
-TRAIN_RATIO = 0.76
-VAL_RATIO = 0.12
-TEST_RATIO = 0.12
+TRAIN_RATIO = 0.70
+VAL_RATIO = 0.15
+TEST_RATIO = 0.15
 
 ORDER = True
 ORDER_METHOD = 1
 NUM_WORKERS = 0
 
 # location to save model and plots
-SAVED_MODEL_DIR = "../saved_models/resnet18v12"
-SAVED_MODEL_NAME = "resnet18v12"
+SAVED_MODEL_DIR = "../saved_models/resnet18v11"
+SAVED_MODEL_NAME = "resnet18v11"
 SAVED_MODEL_FORMAT = ".pt"
 
 SAVE_PLOTS_EPOCH = 4 # save loss plots after these many epochs (the intervals of saving)
 SAVE_MODEL_EPOCH = 4 # save model after these many epochs
 
 # store model's run history
-LOG_DIR = "../running_logs/resnet18v12"
+LOG_DIR = "../running_logs/resnet18v11"
 
 
 # load model from
 LOAD_MODEL_LOCATION = "../saved_models/resnet18v2/resnet18v2best_model.pt"
 
 # wandb running config
-WANDB_PROJECT_NAME = "CNN_bleve_resnet18v12"
+WANDB_PROJECT_NAME = "CNN_bleve_resnet18v11"
 
 
 # the size of tensor arrays being displayed
