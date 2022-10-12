@@ -6,6 +6,8 @@ import cv2
 import glob, sys
 from natsort import natsorted, ns
 import torch, torchvision
+from torchvision import transforms
+from torchvision.transforms import Compose
 from config import *
 from model import create_model
 from functools import reduce
@@ -97,7 +99,9 @@ def read_img(tensor=0, seed=0):
     img_dir = IMG_DIR
     if tensor == 1:
         img_dir = SAVE_IMG_DIR
-        transform = torchvision.transforms.ToTensor()
+        pre_transform = Compose([transforms.ToTensor()])
+        if RESCALE:
+            pre_transform = Compose([transforms.ToTensor(), transforms.Resize(size=[NUM_ROW, NUM_COLUMN])])
 
     img_paths = glob.glob("{}/*{}".format(img_dir, FILE_EXTENSION))
     img_paths = natsorted(img_paths, key=lambda y: y.lower())   # Sort the images in alphanumerical order
@@ -114,14 +118,14 @@ def read_img(tensor=0, seed=0):
             # bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
 
             if tensor == 1:
-                if RESCALE:
-                    bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)
+                '''if RESCALE:
+                    bleve_img = cv2.resize(bleve_img, (NUM_ROW, NUM_COLUMN), interpolation=cv2.INTER_AREA)'''
 
                 # bleve_img = cv2.cvtColor(bleve_img, cv2.COLOR_RGB2GRAY)
                 if DEVICE == "mps":
                     bleve_img = np.float32(bleve_img)
 
-                bleve_img = transform(bleve_img)
+                bleve_img = pre_transform(bleve_img)
                 # print(bleve_img.shape)
 
             dataset_img.append(bleve_img)
