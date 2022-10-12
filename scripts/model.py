@@ -31,11 +31,11 @@ def create_model(new_model=USE_PRETRAIN):
                                      nn.Sigmoid(),
                                      nn.Linear(16, 1))
         else:
-            model.fc = nn.Sequential(nn.Linear(num_features, 512),
+            model.fc = nn.Sequential(nn.Linear(num_features, 256),
                                      nn.LeakyReLU(),
-                                     nn.Linear(512, 64),
+                                     nn.Linear(256, 32),
                                      nn.Sigmoid(),
-                                     nn.Linear(64, 1))
+                                     nn.Linear(32, 1))
 
     elif MODEL_NAME == "efficientnet_b7":
         # Efficientnet_b7
@@ -68,6 +68,16 @@ def create_model(new_model=USE_PRETRAIN):
                                  nn.Linear(256, 32),
                                  nn.Sigmoid(),
                                  nn.Linear(32, 1))
+
+    elif MODEL_NAME == "mobilenet_v2":
+        model = models.mobilenet_v2(pretrained=new_model)
+        num_features = model.classifier[1].in_features
+        model.fc = nn.Sequential(nn.Linear(num_features, 256),
+                                 nn.LeakyReLU(),
+                                 nn.Linear(256, 32),
+                                 nn.Sigmoid(),
+                                 nn.Linear(32, 1))
+
     else:
         Exception(f"{MODEL_NAME} is an invalid model's name")
 
