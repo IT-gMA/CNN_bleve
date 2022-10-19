@@ -8,7 +8,7 @@ from config import DROPOUT, DEVICE, MODEL_NAME, NUM_ROW, NUM_COLUMN, USE_DROP_OU
 
 def create_model(new_model=USE_PRETRAIN):
     if MODEL_NAME == "resnet50" or MODEL_NAME == "resnet18" or MODEL_NAME == "resnet34" or MODEL_NAME == "resnet101" or MODEL_NAME == "resnet152":
-        # Resnet50
+        # Resnet50conda
         if MODEL_NAME == "resnet50":
             model = models.resnet50(pretrained=new_model)
         elif MODEL_NAME == "resnet34":
@@ -33,9 +33,9 @@ def create_model(new_model=USE_PRETRAIN):
         else:
             model.fc = nn.Sequential(nn.Linear(num_features, 256),
                                      nn.LeakyReLU(),
-                                     nn.Linear(256, 32),
+                                     nn.Linear(256, 16),
                                      nn.Sigmoid(),
-                                     nn.Linear(32, 1))
+                                     nn.Linear(16, 1))
 
     elif MODEL_NAME == "efficientnet_b7":
         # Efficientnet_b7
