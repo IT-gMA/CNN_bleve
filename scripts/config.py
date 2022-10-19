@@ -6,15 +6,15 @@ SEED_RANGE = 5
 # Configure the training process
 LEARNING_RATE = 1e-3 #0.0033808570389529695
 MIN_LEARNING_RATE = 0.00015
-WEIGHT_DECAY = 1.1067597759365375e-06
+WEIGHT_DECAY = 1e-06
 USE_DROP_OUT = False
 DROPOUT = 0.2477008537587833
 VARRY_LR = False
 SCHEDULED = True
 MSE_REDUCTION = "mean"
 PATIENCE = 16
-BATCH_SIZE = 192
-VAL_BATCHSIZE = 192
+BATCH_SIZE = 256
+VAL_BATCHSIZE = 256
 PRINT_TRAIN = False
 PRINT_VAL = False
 PRINT_TEST = False
@@ -23,7 +23,7 @@ PRINT_TEST = False
 RESCALE = True
 NUM_ROW = 240
 NUM_COLUMN = 240
-NUM_EPOCHS = 1650    # number of epochs to train for
+NUM_EPOCHS = 1000    # number of epochs to train for
 FILE_EXTENSION = ".png"
 TRAIN_AUG = True
 
@@ -43,9 +43,9 @@ SAVE_OUTPUT_DIR = '../dataset_run/bleve_40x40/outputs/outputs.txt'
 # Dataset split
 SHUFFLE_TRAIN = True
 SHUFFLE_VAL = False
-TRAIN_RATIO = 0.70
-VAL_RATIO = 0.15
-TEST_RATIO = 0.15
+TRAIN_RATIO = 0.74
+VAL_RATIO = 0.13
+TEST_RATIO = 0.13
 
 ORDER = True
 ORDER_METHOD = 1
@@ -75,7 +75,7 @@ NP_FULL_SIZE = False
 
 # nth epoch at which a checkpoint is saved
 SAVED_EPOCH = 100
-SAVED_AFTER = 999
+SAVED_AFTER = 499
 
 # Progress bar
 PROGRESS_SLEEP_TIME = 0.00002
