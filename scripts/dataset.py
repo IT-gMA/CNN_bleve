@@ -47,8 +47,8 @@ def transform_train_set(train_set):
                 aug_train_set.append([aug_img, output])
                 # Add image noise
 
-            '''aug_img = add_noise(img, noise_factor=0.25)
-            aug_train_set.append([aug_img, output])'''
+            aug_img = add_noise(img, noise_factor=0.25)
+            aug_train_set.append([aug_img, output])
             bar.next()
 
     return aug_train_set
@@ -61,14 +61,14 @@ def add_noise(inputs, noise_factor=0.3):
 
 
 def get_transformations():
-    t1 = Compose([transforms.RandomPerspective(distortion_scale=0.40, p=0.60),
-                  '''transforms.RandomRotation(degrees=(0, 35))'''])
+    #t1 = Compose([transforms.RandomPerspective(distortion_scale=0.40, p=0.60)])
+    #transforms.RandomRotation(degrees=(0, 35))])
     '''t2 = Compose([transforms.ColorJitter(brightness=0.2, contrast=0.15, saturation=0.05, hue=0.125),
                   transforms.RandomInvert(p=0.35)])'''
-    t3 = Compose([transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
+    t2 = Compose([transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
                   transforms.RandomAutocontrast()])
 
-    img_transform = [t1, t3]
+    img_transform = [t2]
     return img_transform
 
 
