@@ -4,7 +4,7 @@ import torch
 SEED_RANGE = 5
 
 # Configure the training process
-LEARNING_RATE = 1e-3 #0.0033808570389529695
+LEARNING_RATE = 1e-3  # 0.0033808570389529695
 MIN_LEARNING_RATE = 0.00015
 WEIGHT_DECAY = 1e-06
 USE_DROP_OUT = False
@@ -23,7 +23,7 @@ PRINT_TEST = False
 RESCALE = True
 NUM_ROW = 240
 NUM_COLUMN = 240
-NUM_EPOCHS = 1000    # number of epochs to train for
+NUM_EPOCHS = 12000  # number of epochs to train for
 FILE_EXTENSION = ".png"
 TRAIN_AUG = True
 
@@ -69,7 +69,6 @@ LOAD_MODEL_LOCATION = "../saved_models/resnet18v2/resnet18v2best_model.pt"
 # wandb running config
 WANDB_PROJECT_NAME = "CNN_bleve_resnet18v11"
 
-
 # the size of tensor arrays being displayed
 NP_FULL_SIZE = False
 
@@ -79,3 +78,8 @@ SAVED_AFTER = 499
 
 # Progress bar
 PROGRESS_SLEEP_TIME = 0.00002
+
+# DATASET_SPLITTING
+DEFAULT_DATASET_DIR = "../dataset"
+STORED_DIR = "../dataset_run"
+OG_DATASET_PATH = "../dataset/bleve_40x40"
