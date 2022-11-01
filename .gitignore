@@ -2,3 +2,7 @@
 /dataset_run
 /zipped_data
 /saved_models
+.DS_Store/
+.idea
+running_logs/.DS_Store
+scripts/wandb
