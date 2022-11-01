@@ -65,24 +65,23 @@ def sub_div_shuffle_dataset(data, seed):
 
     random.seed(seed)
     random.shuffle(new_data)
+    #print(len(new_data))
     new_data = reduce(lambda x, y: x + y, new_data)     # reduce the dataset back to a 1d list
-    print("Random shuffled with seed {}".format(seed))
+    print("Random shuffle with seed {}".format(seed))
     return new_data
 
 
-def read_output_txt(tensor=0):
+def read_output_txt(tensor=0, output_path=None):
     output_list = []
 
-    output_file_path = OUTPUT_FILE
+    output_file_path = SAVE_OUTPUT_DIR
     if tensor == 1:
-        output_file_path = SAVE_OUTPUT_DIR
+        output_file_path = output_path
 
     with open(output_file_path, 'r') as f:
         outputs = f.readlines()
         for output in outputs:
             output = float(output[:-1])
-            '''if tensor == 1:
-                print(f"reading output: {output}")'''
             output_list.append(output)
 
     if tensor == 1:
@@ -92,11 +91,11 @@ def read_output_txt(tensor=0):
     return output_list
 
 
-def read_img(tensor=0, seed=0):
+def read_img(tensor=0):
     dataset_img = []
     image_names = []
 
-    img_dir = IMG_DIR
+    img_dir = SAVE_IMG_DIR
     if tensor == 1:
         img_dir = SAVE_IMG_DIR
         pre_transform = Compose([transforms.ToTensor()])
@@ -143,7 +142,7 @@ def get_gas_name(file_name):
 
 def create_raw_dataset(tensor=0, seed=0):
     if tensor == 0:
-        print("Create permanent shuffled dataset at {}.".format(SAVE_IMG_DIR))
+        print("Create permanently shuffled dataset at {}.".format(SAVE_IMG_DIR))
     elif tensor == 1:
         print("Convert data in {} into tensor form for model training.".format(SAVE_IMG_DIR))
     if tensor != 0 or tensor != 1:
@@ -153,13 +152,14 @@ def create_raw_dataset(tensor=0, seed=0):
 
     dataset = []
     output_list = read_output_txt(tensor)
-    img_list, image_names = read_img(tensor, seed)
+    img_list, image_names = read_img(tensor)
     check_data_vs_output_quantity(img_list, output_list)
 
     for i in range(0, len(output_list)):
         # given each image has their corresponding output in the correct order
         if tensor == 0:
-            dataset.append([img_list[i], image_names[i], output_list[i]])
+            #dataset.append([img_list[i], image_names[i], output_list[i]])
+            dataset.append([img_list[i], output_list[i]])
         else:
             dataset.append([img_list[i], output_list[i]])
 
@@ -167,8 +167,8 @@ def create_raw_dataset(tensor=0, seed=0):
     if ORDER:
         dataset = order_liquid_dist_features(dataset, seed)
 
-    if tensor == 0:
-        random.shuffle(dataset)
+    '''if tensor == 0:
+        random.shuffle(dataset)'''
 
     return dataset
 
@@ -269,7 +269,7 @@ def run_dir_exist(dir):
 def create_run_dirs():
     parent_dir1 = f"{SAVED_MODEL_DIR}/"
     parent_dir2 = f"{LOG_DIR}/"
-    mode = 0o666
+    mode = 0o777
     for seed in range(0, SEED_RANGE):
         path1 = os.path.join(parent_dir1, f"seed_{seed}")
         path2 = os.path.join(parent_dir2, f"seed_{seed}")
@@ -277,6 +277,16 @@ def create_run_dirs():
             os.mkdir(path1, mode)
         if not run_dir_exist(path2):
             os.mkdir(path2, mode)
+
+
+def get_saved_dataset_path(seed):
+    saved_dir = OG_DATASET_PATH.replace(f"{DEFAULT_DATASET_DIR}/", "")
+    saved_dataset_path = f"{STORED_DIR}/{saved_dir}/seed_{seed}"
+    output_file_path = f"{saved_dataset_path}/outputs/outputs.txt"
+    print(saved_dataset_path)
+    print(output_file_path)
+
+    return saved_dataset_path, output_file_path
 
 
 if __name__ == '__main__':
@@ -290,6 +300,7 @@ if __name__ == '__main__':
         cv2.imwrite(f"{dataset[i][1]}.png", dataset[i][0])
         cv2.waitKey(0)
         cv2.destroyAllWindows()'''
+    get_saved_dataset_path(0)
     #output_txt = read_output_txt()
     #print(output_txt.reshape(-1, 1))
     #order_liquid_dist_features(None)

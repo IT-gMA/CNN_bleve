@@ -3,13 +3,14 @@ import copy
 import torch
 import torchfunc
 from torch import nn
-from dataset import dataset_import
+from dataset import dataset_import, probabilistic_transformation
 from utils import save_model, save_running_logs, load_model, create_run_dirs
 from metrics import mean_absolute_percentage_error, RMSELoss
 import sys
 import numpy as np
 from config import *
 from model import create_model
+import split_data
 import wandb
 
 if torch.cuda.is_available():
@@ -140,6 +141,9 @@ def train(train_dataloader, model, loss_func, optimiser, seed):
     # Training
     model.train()
     for batch, (X, y) in enumerate(train_dataloader):
+        if TRAIN_AUG:
+            probabilistic_transformation(X)
+
         X, y = X.to(DEVICE), y.to(DEVICE)
 
         # Forward pass
@@ -261,6 +265,8 @@ def main(seed):
 
 
 if __name__ == '__main__':
+    split_data.init_seeded_dataset_dir()
+
     create_run_dirs()
     for seed in range (0, SEED_RANGE):
         if torch.cuda.is_available():
