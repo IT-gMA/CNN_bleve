@@ -207,15 +207,18 @@ def save_model(model, seed, save_from_val=False, final=False, epoch=0, loss=0, o
     return save_location
 
 
-def load_model(saved_location, resume=True):
-    ckpt = torch.load(saved_location, map_location=torch.device('cpu'))
+def load_model(saved_location, device, resume=True):
+    ckpt = torch.load(saved_location)
     model = create_model(ckpt)
-    model.load_state_dict(ckpt)
+    model.load_state_dict(ckpt['model_state_dict'])
 
     if resume:
-        return model.to(DEVICE), ckpt
+        ckpt_optim = ckpt['optimizer_state_dict']
+        ckpt_epoch = ckpt['epoch']
+        ckpt_loss = ckpt['loss']
+        return model.to(device), ckpt_optim, ckpt_epoch, ckpt_loss
     else:
-        return model.to(DEVICE)
+        return model.to(device)
 
 
 def save_running_logs(info, seed):
@@ -255,7 +258,10 @@ def write_run_configs(n_train, n_val, n_test, seed, model=None, transformations=
     else:
         run_config8 = "Empty cuda cache: False\n"
 
-    run_config9 = "Model's fully connected layer: {}\n".format(model.fc)
+    if MODEL_NAME in ["resnet50", "resnet18", "resnet34", "resnet101", "resnet152", "inceptionv3"]:
+        run_config9 = "Model's fully connected layer: {}\n".format(model.fc)
+    else:
+        run_config9 = "Model's fully connected layer: {}\n".format(model.classifier)
 
     config_write = f"{run_config0}{run_config1}{run_config2}{run_config3}{run_config4}{run_config5}{run_config6}{run_config7}{run_config8}{run_config9}\n"
     save_running_logs(config_write, seed)

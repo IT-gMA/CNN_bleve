@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms import Compose
 from progress.bar import FillingSquaresBar
+import random
 from time import sleep
 
 
@@ -22,9 +23,9 @@ def retrieve_dataset(seed):
     val_set = dataset[num_train:num_train + num_val]
     test_set = dataset[num_train + num_val: len(dataset)]
 
-    if TRAIN_AUG:
+    '''if TRAIN_AUG:
         train_set = transform_train_set(train_set)
-        print(f"{len(train_set)} train images")
+        print(f"{len(train_set)} train images")'''
     '''for data in train_set:
         print(data)'''
 
@@ -61,6 +62,39 @@ def add_noise(inputs, noise_factor=0.3):
 
 
 def get_transformations():
+    t0 = Compose([transforms.RandomRotation(degrees=(0, 0))])      # no transformation
+    t1 = Compose([transforms.RandomPerspective(distortion_scale=0.30, p=1.0)])
+    t2 = Compose([transforms.RandomAdjustSharpness(sharpness_factor=5, p=1.0),
+                 transforms.RandomPerspective(distortion_scale=0.10, p=0.5)])
+    t3 = Compose([transforms.ColorJitter(brightness=0.2, contrast=0.15, saturation=0.05, hue=0.125)])
+    t4 = Compose([transforms.GaussianBlur(kernel_size=(7, 13), sigma=(0.1, 0.2)),
+                  transforms.RandomAutocontrast()])
+    t5 = -1     # add noise transformation
+
+    return [t0, t1, t2, t4, t5]
+
+
+def probabilistic_transformation(img_batch):
+    transformation_list = get_transformations()
+    '''augmentation = random.choice(transformation_list)
+    if augmentation == -1:
+        # print("Add noise")
+        return add_noise(img_batch, noise_factor=0.25)
+    else:
+        # print(augmentation)
+        return augmentation(img_batch)'''
+
+    for i in range(len(img_batch)):
+        augmentation = random.choice(transformation_list)
+        if augmentation == -1:
+            # print("Add noise")
+            img_batch[i] = add_noise(img_batch[i], noise_factor=0.25)
+        else:
+            # print(augmentation)
+            img_batch[i] = augmentation(img_batch[i])
+
+
+def getTransformation_ext():
     #t1 = Compose([transforms.RandomPerspective(distortion_scale=0.40, p=0.60)])
     #transforms.RandomRotation(degrees=(0, 35))])
     '''t2 = Compose([transforms.ColorJitter(brightness=0.2, contrast=0.15, saturation=0.05, hue=0.125),
