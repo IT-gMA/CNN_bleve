@@ -77,6 +77,14 @@ def create_model(new_model=USE_PRETRAIN):
                                  nn.Linear(256, 32),
                                  nn.Sigmoid(),
                                  nn.Linear(32, 1))
+    elif MODEL_NAME == "VGG19":
+        model = models.vgg19(pretrained=new_model)
+        num_features = model.classifier[0].in_features
+        model.classifier = nn.Sequential(nn.Linear(num_features, 256),
+                                     nn.LeakyReLU(),
+                                     nn.Linear(256, 16),
+                                     nn.Sigmoid(),
+                                     nn.Linear(16, 1))
 
     else:
         Exception(f"{MODEL_NAME} is an invalid model's name")
